@@ -12,7 +12,7 @@ import {
   Button,
 } from "@mui/material";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import authService from "../api/authService"; // 👈 make sure this path matches your project
+import authService from "../api/authService"; 
 
 const drawerWidth = 200;
 
@@ -73,8 +73,9 @@ export default function Layout() {
           <Toolbar />
           <List>
             {[
-              { text: "Home", path: "/" },
-              { text: "About", path: "/about" },
+              { text: "Users", path: "/" },
+              { text: "Deposits", path: "/deposits" },
+              { text: "VA", path: "/va" },
             ].map((item) => (
               <ListItem key={item.text} disablePadding>
                 <ListItemButton
