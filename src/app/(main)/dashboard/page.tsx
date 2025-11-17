@@ -1,125 +1,256 @@
-import Link from 'next/link';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-import Avatar from '@mui/material/Avatar';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import IconButton from '@mui/material/IconButton';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  IconButton,
+  Button,
+  Drawer,
+  TextField,
+  Box,
+  CircularProgress,
+  Alert,
+  Snackbar,
+} from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import AddIcon from "@mui/icons-material/Add";
+import apiClient from "../../../pages/services/apiService";
+import { API_ENDPOINTS } from "../../../pages/services/endpointDefinition";
 
 export default function DashboardPage() {
-  const stats = [
-    { label: 'Pending Applications', value: 24, color: 'bg-amber-100' },
-    { label: 'Deposits > $1,000', value: 7, color: 'bg-emerald-100' },
-    { label: 'Active Accounts', value: 1284, color: 'bg-sky-100' },
-  ];
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [admins, setAdmins] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [errorCreating, setErrorCreating] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const recent = [
-    { id: 1, who: 'Acme Corp', action: 'Applied for USD/EUR account', time: '2 hours ago' },
-    { id: 2, who: 'BlueFin Ltd', action: 'Deposit $2,500 (GBP)', time: '5 hours ago' },
-    { id: 3, who: 'Jane Doe', action: 'KYC documents uploaded', time: 'Yesterday' },
-  ];
+  // Form fields for new admin
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("");
+  const [password, setPassword] = useState("");
+
+  // Fetch admins from backend
+  const fetchAdmins = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      setRole("admin");
+
+      const res = await apiClient.get(API_ENDPOINTS.ALL_ADMIN);
+      if (!res.status) throw new Error("Failed to fetch admin data");
+
+      setAdmins(res.data.data || []);
+    } catch (err: any) {
+      setError(err.message || "An error occurred while fetching admins");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdmins();
+  }, []);
+
+  // Handle form submit
+  const handleSave = async () => {
+    if (!email || !password || !role) {
+      setErrorCreating("Please fill all fields before creating");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setErrorCreating(null);
+
+      const payload = {
+        email,
+        password,
+        role,
+      };
+
+      const res = await apiClient.post(API_ENDPOINTS.ADD_ADMIN_ACCOUNT, payload);
+      if (res.status !== 200 && res.status !== 201) {
+        throw new Error("Failed to create admin account");
+      }
+
+      // Clear form
+      setEmail("");
+      setPassword("");
+      setRole("admin");
+
+      // Show success message
+      setSuccessMessage("Admin created successfully!");
+
+      // Close drawer
+      setOpenDrawer(false);
+
+      // Refresh the table
+      fetchAdmins();
+    } catch (err: any) {
+      setErrorCreating(err.message || "An error occurred while creating admin");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50">
       <div className="mx-auto max-w-7xl px-4 py-6">
         <div className="grid grid-cols-12 gap-6">
-          {/* Sidebar */}
-          <aside className="col-span-12 md:col-span-2">
-            <div className="sticky top-6 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-md bg-sky-600 flex items-center justify-center text-white font-bold">CP</div>
-                <div>
-                  <Typography variant="subtitle1" component="div">Compliance</Typography>
-                  <div className="text-sm text-zinc-500 dark:text-zinc-400">Portal</div>
-                </div>
-              </div>
-
-              <nav className="mt-6 flex flex-col gap-2">
-                <Link href="/" className="rounded-md px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800">Dashboard</Link>
-                <Link href="/applications" className="rounded-md px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800">Applications</Link>
-                <Link href="/deposits" className="rounded-md px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800">Deposits</Link>
-                <Link href="/auth/signin" className="rounded-md px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800">Sign out</Link>
-              </nav>
-            </div>
-          </aside>
-
           {/* Main content */}
           <main className="col-span-12 md:col-span-10">
             <div className="flex items-center justify-between">
               <div>
-                <Typography variant="h5" component="h1">Dashboard</Typography>
-                <div className="text-sm text-zinc-500 dark:text-zinc-400">Overview of applications, deposits and account activity</div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="hidden sm:block">
-                  <input placeholder="Search applications" className="rounded-md border border-zinc-200 px-3 py-2 dark:bg-zinc-800" />
+                <Typography variant="h5" component="h1">
+                  Admin Dashboard
+                </Typography>
+                <div className="text-sm text-zinc-500 dark:text-zinc-400">
+                  Overview of every admin onboarded onto Kite
                 </div>
-                <Avatar className="bg-sky-600">C</Avatar>
               </div>
-            </div>
 
-            <div className="mt-6 grid gap-6 md:grid-cols-3">
-              {stats.map((s) => (
-                <Card key={s.label} className="shadow-sm">
-                  <CardContent>
-                    <div className={`flex items-center justify-between gap-4 ${s.color} rounded-md p-3`}>
-                      <div>
-                        <Typography variant="subtitle2" className="text-zinc-600 dark:text-zinc-300">{s.label}</Typography>
-                        <Typography variant="h6" component="div" className="mt-1">{s.value}</Typography>
-                      </div>
-                      <div>
-                        <IconButton size="small"><MoreVertIcon /></IconButton>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+              <div className="flex items-center justify-between mb-4">
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => setOpenDrawer(true)}
+                >
+                  New Admin
+                </Button>
+              </div>
             </div>
 
             <div className="mt-8">
               <Card className="shadow-sm">
                 <CardContent>
-                  <div className="flex items-center justify-between">
-                    <Typography variant="h6">Recent activity</Typography>
-                    <div className="text-sm text-zinc-500 dark:text-zinc-400">Showing latest 10</div>
-                  </div>
+                  {/* Loading */}
+                  {loading && (
+                    <div className="flex justify-center py-12">
+                      <CircularProgress />
+                    </div>
+                  )}
 
-                  <div className="mt-4 overflow-x-auto">
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Who</TableCell>
-                          <TableCell>Action</TableCell>
-                          <TableCell>When</TableCell>
-                          <TableCell align="right">Actions</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {recent.map((r) => (
-                          <TableRow key={r.id}>
-                            <TableCell>{r.who}</TableCell>
-                            <TableCell>{r.action}</TableCell>
-                            <TableCell>{r.time}</TableCell>
-                            <TableCell align="right">
-                              <Link href={`/applications/${r.id}`} className="text-sky-600">Open</Link>
+                  {/* Error */}
+                  {!loading && error && (
+                    <Alert severity="error" className="my-4">
+                      {error}
+                    </Alert>
+                  )}
+
+                  {/* Table */}
+                  {!loading && !error && (
+                    <div style={{ maxHeight: "65vh", overflowY: "auto" }}>
+                      <Table stickyHeader>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Email</TableCell>
+                            <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Role</TableCell>
+                            <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Status</TableCell>
+                            <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Created Date</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: "bold", fontSize: "1rem" }}>
+                              Actions
                             </TableCell>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                        </TableHead>
+
+                        <TableBody>
+                          {admins.length > 0 ? (
+                            admins.map((admin) => (
+                              <TableRow key={admin.id} hover>
+                                <TableCell>{admin.email}</TableCell>
+                                <TableCell>{admin.role}</TableCell>
+                                <TableCell>{admin.is_active ? "Active" : "Inactive"}</TableCell>
+                                <TableCell>{admin.created_at}</TableCell>
+                                <TableCell align="right">
+                                  <IconButton>
+                                    <MoreVertIcon />
+                                  </IconButton>
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          ) : (
+                            <TableRow>
+                              <TableCell colSpan={5} align="center">
+                                No admin data available
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
           </main>
         </div>
       </div>
+
+      {/* Drawer for new form */}
+      <Drawer anchor="right" open={openDrawer} onClose={() => setOpenDrawer(false)}>
+        <Box sx={{ width: 350, p: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Add New Admin
+          </Typography>
+
+          {errorCreating && (
+            <Alert severity="error" className="my-2">
+              {errorCreating}
+            </Alert>
+          )}
+
+          <TextField
+            label="Email"
+            fullWidth
+            margin="normal"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            label="Role"
+            fullWidth
+            margin="normal"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          />
+          <TextField
+            label="Password"
+            fullWidth
+            margin="normal"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{ mt: 2 }}
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? <CircularProgress size={24} /> : "Save"}
+          </Button>
+        </Box>
+      </Drawer>
+
+      {/* Success Snackbar */}
+      <Snackbar
+        open={!!successMessage}
+        autoHideDuration={3000}
+        onClose={() => setSuccessMessage(null)}
+        message={successMessage}
+      />
     </div>
   );
 }
