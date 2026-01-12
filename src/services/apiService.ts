@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 // ✅ Create an Axios instance
 const apiClient: AxiosInstance = axios.create({
@@ -11,7 +11,7 @@ const apiClient: AxiosInstance = axios.create({
 
 // ✅ Request Interceptor — adds Bearer token
 apiClient.interceptors.request.use(
-  (config: AxiosRequestConfig) => {
+  (config) => {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
     if (token && config.headers) {

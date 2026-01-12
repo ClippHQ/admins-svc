@@ -26,15 +26,13 @@ export default function DashboardPage() {
 
 
 
-    const {data: deposits, error: queryError, isLoading, isPending, hasNextPage, fetchNextPage, rawData} = useDeposits();
+    const {data: deposits, error: queryError, isLoading, isPending, hasNextPage, fetchNextPage, rawData, isFetchingNextPage} = useDeposits();
 
-    const loading = isLoading || isPending;
+    const loading = isLoading || isPending || isFetchingNextPage;
 
     
 
   // Modal handler
-  const [selectedDeposit, setSelectedDeposit] = useState<Deposit | null>(null);
-  const [openModal, setOpenModal] = useState(false);
 
   const error = queryError ? (queryError as Error).message ?? 'Something went wrong' : null;
 
@@ -128,7 +126,12 @@ export default function DashboardPage() {
                     <Pagination
                       count={rawData ? rawData.pages[0]?.rows || 1 : 1}
                       page={page}
-                      onChange={(event, value) => setPage(page + 1)}
+                      onChange={() => {
+                           if(!hasNextPage) return;
+                        setPage(page + 1)
+                     
+                        fetchNextPage()
+                      }}
                       color="primary"
                     />
                   </div>
