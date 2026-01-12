@@ -194,7 +194,11 @@ export default function DashboardPage() {
                                     <p><strong>Account Name:</strong> {selectedPayout.account_name}</p>
                                     <p><strong>Account Number:</strong> {selectedPayout.account_number}</p>
                                     <p><strong>Banke Name:</strong> {selectedPayout.bank_name}</p>
-                                    <p><strong>Amount Source:</strong> {selectedPayout.currency_source} {selectedPayout.amount_source.toLocaleString()}</p>
+                                    <p><strong>Amount Source:</strong> {formatAmount({
+                                                                    amount: (selectedPayout?.amount_source ?? 0) / 100,
+                                                                    currency: selectedPayout?.currency_source ?? 'USD',
+                                                                    withDecimals: true
+                                                                })}</p>
                                     <p><strong>Fee:</strong> {selectedPayout.currency_source} {selectedPayout.fee.toLocaleString()}</p>
                                     <p><strong>Provider:</strong> {selectedPayout.provider}</p>
                                 </div>
@@ -207,10 +211,14 @@ export default function DashboardPage() {
                                 </Typography>
 
                                 <div className="space-y-2">
-                                    <p><strong>Recipient det:</strong> {selectedPayout.recipient_information}</p>
-                                    <p><strong>Bank Address:</strong> {selectedPayout.bank_address}</p>
+                                    <p><strong>Recipient det:</strong> {selectedPayout?.recipient_information + ''}</p>
+                                    <p><strong>Bank Address:</strong> {selectedPayout?.bank_address}</p>
                                     <p><strong>Status:</strong> {selectedPayout.status}</p>
-                                    <p><strong>Amount Destination:</strong> {selectedPayout.currency_destination} {selectedPayout.amount_destination.toLocaleString()}</p>
+                                    <p><strong>Amount Destination:</strong> {formatAmount({
+                                        currency: selectedPayout.currency_destination ?? 'USD',
+                                        amount: (selectedPayout.amount_destination ?? 0) / 100,
+                                        withDecimals: true
+                                    })}</p>
                                     <p><strong>Created At:</strong>
                                         {selectedPayout.created_at ?? "N/A"}
                                     </p>
