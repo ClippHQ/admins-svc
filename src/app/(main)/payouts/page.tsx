@@ -24,9 +24,11 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import apiClient from "../../../services/apiService";
 import { API_ENDPOINTS } from "../../../services/endpointDefinition";
+import { Payout } from "src/types";
+import { formatAmount } from "src/lib/amount";
 
 export default function DashboardPage() {
-    const [payouts, setPayout] = useState<any[]>([]);
+    const [payouts, setPayout] = useState<Payout[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
       const [page, setPage] = useState(1);
@@ -34,7 +36,7 @@ export default function DashboardPage() {
       const [totalPages, setTotalPages] = useState(1);
 
     // Modal handler
-    const [selectedPayout, setSelectedPayout] = useState<any | null>(null);
+    const [selectedPayout, setSelectedPayout] = useState<Payout | null>(null);
     const [openModal, setOpenModal] = useState(false);
 
 
@@ -124,11 +126,15 @@ export default function DashboardPage() {
                                                         payouts.map((payout) => (
                                                             <TableRow hover
                                                                 onClick={() => handleRowClick(payout)}
+                                                                key={payout.id}
                                                                 style={{ cursor: "pointer" }}>
                                                                 <TableCell>{payout.account_name}</TableCell>
                                                                 <TableCell>{payout.bank_name}</TableCell>
                                                                 <TableCell>{payout.is_document_required == 1 ? "YES" : "No"}</TableCell>
-                                                                <TableCell>{payout.amount_source.toLocaleString()}</TableCell>
+                                                                <TableCell>{formatAmount({
+                                                                    amount: (payout.amount_source ?? 0) / 100,
+                                                                    currency: payout.currency_source ?? 'USD',
+                                                                })}</TableCell>
                                                                 <TableCell>{payout.currency_source}</TableCell>
                                                                 <TableCell>{payout.status}</TableCell>
                                                                 <TableCell>{payout.created_at}</TableCell>
