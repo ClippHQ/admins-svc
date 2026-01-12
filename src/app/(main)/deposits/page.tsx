@@ -17,6 +17,7 @@ import {
 import { Deposit } from "src/types";
 import { useDeposits } from "src/api/deposit";
 import { useRouter } from "next/navigation";
+import { formatAmount } from "src/lib/amount";
 
 export default function DashboardPage() {
 
@@ -106,7 +107,11 @@ export default function DashboardPage() {
                                 <TableCell>{deposit.account_id}</TableCell>
                                 <TableCell>{deposit.type}</TableCell>
                                 <TableCell>{deposit.provider}</TableCell>
-                                <TableCell>{deposit.amount.toLocaleString()}</TableCell>
+                                <TableCell>{formatAmount({
+                                  currency: deposit.currency ?? 'USD',
+                                  amount: (deposit.amount ?? 0) / 100,
+                                  withDecimals: true
+                                })}</TableCell>
                                 <TableCell>{deposit.currency}</TableCell>
                                 <TableCell align="right">{deposit.status}</TableCell>
                               </TableRow>
