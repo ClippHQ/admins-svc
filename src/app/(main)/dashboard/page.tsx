@@ -22,8 +22,8 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AddIcon from "@mui/icons-material/Add";
-import apiClient from "../../../pages/services/apiService";
-import { API_ENDPOINTS } from "../../../pages/services/endpointDefinition";
+import apiClient from "../../../services/apiService";
+import { API_ENDPOINTS } from "../../../services/endpointDefinition";
 
 export default function DashboardPage() {
   const [openDrawer, setOpenDrawer] = useState(false);

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useInfiniteQuery, InfiniteData } from "@tanstack/react-query";
 import { useCallback } from "react";
-import apiClient from "src/pages/services/apiService";
-import { API_ENDPOINTS } from "src/pages/services/endpointDefinition";
+import apiClient from "src/services/apiService";
+import { API_ENDPOINTS } from "src/services/endpointDefinition";
 import { Deposit, PaginatedResponse, Profile, Wallet } from "src/types";
 
 type FetchDepositResponse = {deposit: Deposit; profile: Profile; wallet: Wallet}

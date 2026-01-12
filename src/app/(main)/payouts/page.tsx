@@ -22,8 +22,8 @@ import {
     Pagination,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import apiClient from "../../../pages/services/apiService";
-import { API_ENDPOINTS } from "../../../pages/services/endpointDefinition";
+import apiClient from "../../../services/apiService";
+import { API_ENDPOINTS } from "../../../services/endpointDefinition";
 
 export default function DashboardPage() {
     const [payouts, setPayout] = useState<any[]>([]);

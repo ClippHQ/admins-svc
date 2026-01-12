@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -10,16 +10,10 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Dialog,
-  DialogTitle,
-  DialogContent,
   Pagination,
-  Box,
-  IconButton,
   CircularProgress,
   Alert,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import { Deposit } from "src/types";
 import { useDeposits } from "src/api/deposit";
 import { useRouter } from "next/navigation";
@@ -27,7 +21,6 @@ import { useRouter } from "next/navigation";
 export default function DashboardPage() {
 
 
-  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const router = useRouter()
 
@@ -40,15 +33,11 @@ export default function DashboardPage() {
     
 
   // Modal handler
-  const [selectedDeposit, setSelectedDeposit] = useState<any | null>(null);
+  const [selectedDeposit, setSelectedDeposit] = useState<Deposit | null>(null);
   const [openModal, setOpenModal] = useState(false);
 
+  const error = queryError ? (queryError as Error).message ?? 'Something went wrong' : null;
 
-  useEffect(() => {
-    if(queryError) {
-      setError("Error fetching deposits. Please try again later." + queryError.message);
-    }
-  } , [queryError])
 
   // Collect and handle data for madal
   const handleRowClick = (deposit: Deposit) => {
@@ -150,58 +139,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Modal data */}
-      <Dialog
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle className="flex justify-between items-center">
-          Deposit Details
-          <IconButton onClick={() => setOpenModal(false)}>
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-
-        <DialogContent dividers>
-          {selectedDeposit && (
-            <Box className="grid grid-cols-2 gap-6">
-
-              {/* LEFT SECTION */}
-              <Box>
-                <Typography variant="h6" gutterBottom>
-                  <strong><em>Depositors Info</em></strong>
-                </Typography>
-
-                <div className="space-y-2">
-                  <p><strong>Payer's Name:</strong> {selectedDeposit.transaction_object.payer.name ?? "N/A"}</p>
-                  <p><strong>Banke Name:</strong> {selectedDeposit.transaction_object.payer.bank_name ?? "N/A"}</p>
-                  <p><strong>Account Number:</strong> {selectedDeposit.transaction_object.payer.account_number ?? "N/A"}</p>
-                  <p><strong>Trans. reason:</strong> {selectedDeposit.transaction_object.reason ?? "N/A"}</p>
-                </div>
-              </Box>
-
-              {/* RIGHT SECTION */}
-              <Box>
-                <Typography variant="h6" gutterBottom>
-                  <strong><em>Transaction Details</em></strong>
-                </Typography>
-
-                <div className="space-y-2">
-                  <p><strong>Amount:</strong> {selectedDeposit.currency} {selectedDeposit.amount.toLocaleString()}</p>
-                  <p><strong>Amount settled:</strong> {selectedDeposit.currency} {selectedDeposit.amount_settled.toLocaleString()}</p>
-                  <p><strong>Fee:</strong> {selectedDeposit.currency} {selectedDeposit.fee.toLocaleString()}</p>
-                  <p><strong>Created At:</strong>
-                    {selectedDeposit.created_at ?? "N/A"}
-                  </p>
-                </div>
-              </Box>
-
-            </Box>
-          )}
-        </DialogContent>
-      </Dialog>
+  
     </div>
   );
 }

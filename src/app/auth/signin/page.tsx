@@ -6,8 +6,8 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import apiClient from "../../../pages/services/apiService" 
-import { API_ENDPOINTS } from "../../../pages/services/endpointDefinition";
+import apiClient from "../../../services/apiService" 
+import { API_ENDPOINTS } from "../../../services/endpointDefinition";
 
 export default function SignIn() {
   const router = useRouter();
