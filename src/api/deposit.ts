@@ -2,9 +2,9 @@ import { useQuery, useMutation, useInfiniteQuery, InfiniteData } from "@tanstack
 import { useCallback } from "react";
 import apiClient from "src/services/apiService";
 import { API_ENDPOINTS } from "src/services/endpointDefinition";
-import { Deposit, PaginatedResponse, Profile, Wallet } from "src/types";
+import { Deposit, KYCVerification, PaginatedResponse, Profile, Wallet } from "src/types";
 
-type FetchDepositResponse = {deposit: Deposit; profile: Profile; wallet: Wallet}
+type FetchDepositResponse = {deposit: Deposit; profile: Profile; wallet: Wallet; kyc_verification: KYCVerification}
 
 export function useDeposits(limit = 20) {
     async function fetchDeposit(pageNumber: number, limitNumber: number) {

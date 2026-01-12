@@ -126,6 +126,14 @@ export default function DepositDetailsPage() {
     const loading = status === 'pending'
     const errorMessage = status === 'error' ? error?.message || "An unexpected error occurred" : null;
 
+    const address = React.useMemo(() => {
+        if (!deposit?.kyc_verification) return '-';
+        const addressArray = [deposit.kyc_verification.address_street ?? '', deposit.kyc_verification.address_street_2 ?? '', deposit.kyc_verification.address_city ?? '', deposit.kyc_verification.address_state ?? '', deposit.kyc_verification.address_zip ?? '', deposit.kyc_verification.address_country ?? ''].filter(item => item.length > 0);
+        console.log(addressArray, deposit.kyc_verification)
+        return addressArray.join(', ') ?? '-';
+        
+    }, [deposit?.kyc_verification])
+
     function confirmRejectDeposit() { 
         setAlertDialogOpen(false);
         if (action === 'none' || !params?.id) return;
@@ -187,9 +195,10 @@ export default function DepositDetailsPage() {
                                 <Typography variant="subtitle2">Registered At</Typography>
                                 <Typography variant="body1" fontWeight="bold">{format(deposit?.profile?.created_at || new Date(), "dd MMM, yyyy")}</Typography>
                             </Grid>
-                            <Grid size={4} >
-                                <Typography variant="subtitle2">BVN</Typography>
-                                <Typography variant="body1" fontWeight="bold">***redacted**</Typography>
+             
+                                     <Grid size={4} >
+                                <Typography variant="subtitle2">Address</Typography>
+                                <Typography variant="body1" fontWeight="bold">{address}</Typography>
                             </Grid>
 
                         </Grid>
@@ -258,6 +267,16 @@ export default function DepositDetailsPage() {
                                                 currency: deposit?.deposit?.currency ?? 'USD',
                                             })}</Typography>
                                         </Grid>
+
+
+                                    </Grid>
+
+                                         <Grid container>
+                                        <Grid size={4} >
+                                            <Typography variant="subtitle2">Deposit provider</Typography>
+                                            <Typography variant="body1" textTransform="capitalize" fontWeight="bold">{deposit?.deposit?.provider ?? '-'}</Typography>
+                                        </Grid>
+                      
 
 
                                     </Grid>
