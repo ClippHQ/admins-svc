@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 // ✅ Create an Axios instance
 const apiClient: AxiosInstance = axios.create({
-  baseURL: process.env.BASE_URL || "http://localhost:8080/",
+  baseURL: process.env.BASE_URL || "https://staging.getkite.app/",
   timeout: 120000,
   headers: {
     "Content-Type": "application/json",
