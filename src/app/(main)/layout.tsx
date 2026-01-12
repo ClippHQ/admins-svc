@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Typography } from "@mui/material";
 import { usePathname } from "next/navigation";
+import QueryProvider from "src/components/query-provider";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -18,6 +19,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   ];
 
   return (
+    <QueryProvider>
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50">
       <div className="mx-auto max-w-7xl px-4 py-6">
         <div className="grid grid-cols-12 gap-6">
@@ -62,5 +64,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </div>
       </div>
     </div>
+    </QueryProvider>
   );
 }

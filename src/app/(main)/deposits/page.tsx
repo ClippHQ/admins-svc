@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -21,52 +20,42 @@ import {
   Alert,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import apiClient from "../../../pages/services/apiService";
-import { API_ENDPOINTS } from "../../../pages/services/endpointDefinition";
+import { Deposit } from "src/types";
+import { useDeposits } from "src/api/deposit";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
-  const [deposits, setDeposit] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+
+
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
+  const router = useRouter()
+
+
+
+    const {data: deposits, error: queryError, isLoading, isPending, hasNextPage, fetchNextPage, rawData} = useDeposits();
+
+    const loading = isLoading || isPending;
+
+    
 
   // Modal handler
   const [selectedDeposit, setSelectedDeposit] = useState<any | null>(null);
   const [openModal, setOpenModal] = useState(false);
 
 
-  // Fetch deposits from backend
-  const fetchDeposits = async (pageNumber = page) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const res = await apiClient.get(`${API_ENDPOINTS.ALL_DEPOSITS}?page=${pageNumber}&limit=${limit}`);
-
-      if (!res.status) throw new Error("Failed to fetch deposit data");
-
-      const data = res.data
-      setDeposit(data.payload || []);
-      setTotalPages(Math.ceil(data.total / limit));
-      setPage(data.page);
-    } catch (err: any) {
-      setError(err.message || "An error occurred while fetching deposits");
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if(queryError) {
+      setError("Error fetching deposits. Please try again later." + queryError.message);
     }
-  };
+  } , [queryError])
 
   // Collect and handle data for madal
-  const handleRowClick = (deposit: any) => {
-    setSelectedDeposit(deposit);
-    setOpenModal(true);
+  const handleRowClick = (deposit: Deposit) => {
+    router.push(`/deposits/${deposit.id}`)
   };
 
-  useEffect(() => {
-    fetchDeposits(page);
-  }, [page]);
+
 
 
   return (
@@ -124,6 +113,7 @@ export default function DashboardPage() {
                           {deposits.length > 0 ? (
                             deposits.map((deposit) => (
                               <TableRow hover
+                              key={deposit.id}
                                 onClick={() => handleRowClick(deposit)}
                                 style={{ cursor: "pointer" }}>
                                 <TableCell>{deposit.account_id}</TableCell>
@@ -147,9 +137,9 @@ export default function DashboardPage() {
                   )}
                   <div className="flex justify-center mt-4">
                     <Pagination
-                      count={totalPages}
+                      count={rawData ? rawData.pages[0]?.rows || 1 : 1}
                       page={page}
-                      onChange={(event, value) => setPage(value)}
+                      onChange={(event, value) => setPage(page + 1)}
                       color="primary"
                     />
                   </div>

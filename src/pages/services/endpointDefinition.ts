@@ -7,4 +7,7 @@ export const API_ENDPOINTS = {
   USERS: "/users",
   APPLICATIONS: "/applications",
   DEPOSITS: "/deposits",
+DEPOSIT_DETAILS: "/admin/deposit/get-deposit-details",  // GET /admin/deposit/get-deposit-details/<string:deposit_id>,
+ CONFIRM_REJECT_DEPOSIT_MTN: '/admin/deposit/confirm-reject', // POST /admin/deposit/confirm-reject/<string:deposit_id>
+ LIST_WA_TRANSACTIONS: "/admin/transactions/list-wallet-account-transactions" // GET
 };

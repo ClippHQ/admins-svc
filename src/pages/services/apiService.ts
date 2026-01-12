@@ -2,8 +2,8 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 // ✅ Create an Axios instance
 const apiClient: AxiosInstance = axios.create({
-  baseURL: process.env.BASE_URL || "http://localhost:5000/",
-  timeout: 10000,
+  baseURL: process.env.BASE_URL || "http://localhost:8080/",
+  timeout: 120000,
   headers: {
     "Content-Type": "application/json",
   },
