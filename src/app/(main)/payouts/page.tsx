@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import {
     Card,
     CardContent,
@@ -14,7 +13,6 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
-    Divider,
     Box,
     IconButton,
     CircularProgress,
@@ -53,21 +51,22 @@ export default function DashboardPage() {
             setPayout(data.payload || []);
             setTotalPages(Math.ceil(data.total / limit));
       setPage(data.page);
-        } catch (err: any) {
-            setError(err.message || "An error occurred while fetching payouts");
+        } catch (err) {
+            setError((err as Error).message || "An error occurred while fetching payouts");
         } finally {
             setLoading(false);
         }
     };
 
     // Collect and handle data for madal
-    const handleRowClick = (payout: any) => {
+    const handleRowClick = (payout: Payout) => {
         setSelectedPayout(payout);
         setOpenModal(true);
     };
 
     useEffect(() => {
         fetchPayouts(page);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page]);
 
 
