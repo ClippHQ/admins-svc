@@ -1,74 +1,40 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
     Card,
     CardContent,
     Typography,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
     Dialog,
     DialogTitle,
     DialogContent,
     Box,
     IconButton,
-    CircularProgress,
     Alert,
-    Pagination,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import apiClient from "../../../services/apiService";
-import { API_ENDPOINTS } from "../../../services/endpointDefinition";
 import { Payout } from "src/types";
 import { formatAmount } from "src/lib/amount";
+import { usePayouts } from "src/api/transactions";
+import { GenericTableGenerator } from "src/components/generic-table-generator";
 
 export default function DashboardPage() {
-    const [payouts, setPayout] = useState<Payout[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-      const [page, setPage] = useState(1);
-      const [limit] = useState(10);
-      const [totalPages, setTotalPages] = useState(1);
+    const infiniteData = usePayouts(30);
+    const { data: payouts, error: queryError } = infiniteData;
+
 
     // Modal handler
     const [selectedPayout, setSelectedPayout] = useState<Payout | null>(null);
     const [openModal, setOpenModal] = useState(false);
 
+    const error = queryError ? (queryError as Error).message ?? 'Something went wrong' : null;
 
-    // Fetch payouts from backend
-    const fetchPayouts = async (pageNumber = page) => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            const res = await apiClient.get(`${API_ENDPOINTS.ALL_PAYOUTS}?page=${pageNumber}&limit=${limit}`);
-            if (!res.status) throw new Error("Failed to fetch payout data");
-
-            const data = res.data
-            setPayout(data.payload || []);
-            setTotalPages(Math.ceil(data.total / limit));
-      setPage(data.page);
-        } catch (err) {
-            setError((err as Error).message || "An error occurred while fetching payouts");
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // Collect and handle data for madal
     const handleRowClick = (payout: Payout) => {
         setSelectedPayout(payout);
         setOpenModal(true);
     };
-
-    useEffect(() => {
-        fetchPayouts(page);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page]);
-
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50">
@@ -90,74 +56,45 @@ export default function DashboardPage() {
                         <div className="mt-8">
                             <Card className="shadow-sm">
                                 <CardContent>
-                                    {/* Loading */}
-                                    {loading && (
-                                        <div className="flex justify-center py-12">
-                                            <CircularProgress />
-                                        </div>
-                                    )}
 
                                     {/* Error */}
-                                    {!loading && error && (
+                                    {error && (
                                         <Alert severity="error" className="my-4">
                                             {error}
                                         </Alert>
                                     )}
 
                                     {/* Table */}
-                                    {!loading && !error && (
-                                        <div style={{ maxHeight: "85vh", width: "100%", overflowY: "auto" }}>
-                                            <Table stickyHeader>
-                                                <TableHead>
-                                                    <TableRow>
-                                                        <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Account Name</TableCell>
-                                                        <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Bank Name</TableCell>
-                                                        <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Document</TableCell>
-                                                        <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Amount src</TableCell>
-                                                        <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Currency src</TableCell>
-                                                        <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Status</TableCell>
-                                                        <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Date</TableCell>
-                                                    </TableRow>
-                                                </TableHead>
+                                    <GenericTableGenerator
+                                        data={payouts}
+                                        columnRender={{
+                                            created_at: 'date',
+                                            account_name: 'text',
+                                            currency_source: 'text',
+                                            amount_source: (value) => {
+                                                return formatAmount({
+                                                    amount: (value.amount_source) / 100,
+                                                    currency: value.currency_source || 'USD',
+                                                    withDecimals: true
+                                                })
+                                            },
+                                            fee: (value) => {
+                                                return formatAmount({
+                                                    amount: (value.fee) / 100,
+                                                    currency: value.currency_source || 'USD',
+                                                    withDecimals: true
+                                                })
+                                            },
 
-                                                <TableBody>
-                                                    {payouts.length > 0 ? (
-                                                        payouts.map((payout) => (
-                                                            <TableRow hover
-                                                                onClick={() => handleRowClick(payout)}
-                                                                key={payout.id}
-                                                                style={{ cursor: "pointer" }}>
-                                                                <TableCell>{payout.account_name}</TableCell>
-                                                                <TableCell>{payout.bank_name}</TableCell>
-                                                                <TableCell>{payout.is_document_required == 1 ? "YES" : "No"}</TableCell>
-                                                                <TableCell>{formatAmount({
-                                                                    amount: (payout.amount_source ?? 0) / 100,
-                                                                    currency: payout.currency_source ?? 'USD',
-                                                                })}</TableCell>
-                                                                <TableCell>{payout.currency_source}</TableCell>
-                                                                <TableCell>{payout.status}</TableCell>
-                                                                <TableCell>{payout.created_at}</TableCell>
-                                                            </TableRow>
-                                                        ))
-                                                    ) : (
-                                                        <TableRow>
-                                                            <TableCell colSpan={5} align="center">
-                                                                No payout data available
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    )}
-                                                </TableBody>
-                                            </Table>
-                                        </div>
-                                    )}
-                                    <div className="flex justify-center mt-4">
-                                                        <Pagination
-                                                          count={totalPages}
-                                                          page={page}
-                                                          onChange={(event, value) => setPage(value)}
-                                                          color="primary"
-                                                        />
-                                                      </div>
+
+                                        }}
+                                        onRowClick={handleRowClick}
+                                        infiniteQueryResult={infiniteData}
+                                        paginationModel={{
+                                            page: 0,
+                                            pageSize: 30
+                                        }}
+                                    />
                                 </CardContent>
                             </Card>
                         </div>
@@ -194,11 +131,15 @@ export default function DashboardPage() {
                                     <p><strong>Account Number:</strong> {selectedPayout.account_number}</p>
                                     <p><strong>Banke Name:</strong> {selectedPayout.bank_name}</p>
                                     <p><strong>Amount Source:</strong> {formatAmount({
-                                                                    amount: (selectedPayout?.amount_source ?? 0) / 100,
-                                                                    currency: selectedPayout?.currency_source ?? 'USD',
-                                                                    withDecimals: true
-                                                                })}</p>
-                                    <p><strong>Fee:</strong> {selectedPayout.currency_source} {selectedPayout.fee.toLocaleString()}</p>
+                                        amount: (selectedPayout?.amount_source ?? 0) / 100,
+                                        currency: selectedPayout?.currency_source ?? 'USD',
+                                        withDecimals: true
+                                    })}</p>
+                                    <p><strong>Fee:</strong> {formatAmount({
+                                        amount: (selectedPayout?.fee ?? 0) / 100,
+                                        currency: selectedPayout?.currency_source ?? 'USD',
+                                        withDecimals: true
+                                    })}</p>
                                     <p><strong>Provider:</strong> {selectedPayout.provider}</p>
                                 </div>
                             </Box>

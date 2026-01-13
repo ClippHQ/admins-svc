@@ -31,7 +31,7 @@ export function useDeposits(limit = 20) {
 
             queryFn: ({ pageParam = 1 }) => fetchDeposit(pageParam, limit),
             getNextPageParam: (lastPage) => {
-                const morePagesExist = lastPage.page >= lastPage.rows;
+                const morePagesExist = lastPage.page < lastPage.rows;
                 if (!morePagesExist) return undefined;
                 return lastPage.page + 1;
             }

@@ -16,6 +16,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { useTransactions } from "src/api/transactions";
+import { GenericTableGenerator } from "src/components/generic-table-generator";
 
 function AlertDialog({open, onConfirm, onCancel, message, title = "Confirm Action"}: {open: boolean; onConfirm: () => void; onCancel: () => void; message: string; title?: string}) {
 
@@ -119,6 +121,8 @@ export default function DepositDetailsPage() {
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
+
+    const infiniteData = useTransactions({limit: 10, wallet_id: deposit?.deposit?.wallet_id ?? ''})
 
     
 
@@ -302,7 +306,20 @@ export default function DepositDetailsPage() {
                                 </Box>
                             </CustomTabPanel>
                             <CustomTabPanel value={value} index={1}>
-                                Item Two
+                                <GenericTableGenerator
+                                    data={infiniteData.data ?? []}
+                                    columnRender={{
+                                        amount: "amount",
+                                        status: "text",
+                                        description: "text"
+                                    }}
+                                    infiniteQueryResult={infiniteData}
+                                    paginationModel={{
+                                        page: 0,
+                                        pageSize: 10,
+                                    }}
+                                
+                                />
                             </CustomTabPanel>
 
 
