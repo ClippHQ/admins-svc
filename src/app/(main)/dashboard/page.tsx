@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useState, useEffect, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -19,21 +18,62 @@ import {
   CircularProgress,
   Alert,
   Snackbar,
+  Paper,
+  LinearProgress,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AddIcon from "@mui/icons-material/Add";
 import apiClient from "../../../services/apiService";
 import { API_ENDPOINTS } from "../../../services/endpointDefinition";
+import { formatAmount } from "src/lib/amount";
+import { useProviderBalances } from "src/api/misc";
+import { titleCase } from "src/components/generic-table-generator";
+
+
+function ProviderBalanceCard({provider, balance, currency}: {provider: string; balance: number; currency: string}) {
+  return (
+                     <Card>
+                        <CardContent>
+      <Typography textTransform="capitalize" gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
+          {titleCase(provider)}
+      </Typography>
+      <Typography variant="h5" component="div">
+        {formatAmount({
+          amount: balance/100,
+          currency,
+        })}
+      </Typography>
+      <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>{currency}</Typography>
+    </CardContent>
+
+                  </Card>
+  )
+}
 
 export default function DashboardPage() {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [admins, setAdmins] = useState<any[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [errorCreating, setErrorCreating] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const {data, status } = useProviderBalances()
 
+  const balances = useMemo(() => {
+    const result: {provider: string; balance: number; currency: string}[] = [];
+    if(data) {
+      Object.keys(data).forEach((provider) => {
+        const itemBalances = data[provider as keyof typeof data];
+        result.push(...itemBalances.map(v => ({
+          ...v,
+          provider
+        })))
+      })
+    }
+    return result;
+  }, [data])
   // Form fields for new admin
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
@@ -130,7 +170,29 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="mt-8">
+            <div className="mt-8 gap-y-[16px]">
+              <Paper>
+               {status === 'pending' ? ( <LinearProgress />) : null}
+                
+                <div className="flex flex-row gap-x-3 gap-y-2 flex-wrap">
+                  {balances.map((balanceItem, index) => (<ProviderBalanceCard key={`provider-${index+1}`} {...balanceItem}  />))}
+                  <Card>
+                        <CardContent>
+      <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
+        Graph
+      </Typography>
+      <Typography variant="h5" component="div">
+        {formatAmount({
+          amount: 120000/100,
+          currency: 'USD',
+        })}
+      </Typography>
+      <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>USD</Typography>
+    </CardContent>
+
+                  </Card>
+                </div>
+              </Paper>
               <Card className="shadow-sm">
                 <CardContent>
                   {/* Loading */}

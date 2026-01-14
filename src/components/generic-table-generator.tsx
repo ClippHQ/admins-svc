@@ -12,7 +12,7 @@ export type TransformedUseQueryResult<T> = Omit<UseInfiniteQueryResult<InfiniteD
 }
 
 
-function titleCase(str: string): string {
+export function titleCase(str: string): string {
     return str
       .toLowerCase()
       .split('_')

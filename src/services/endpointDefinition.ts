@@ -21,5 +21,6 @@ DEPOSIT_DETAILS: "/admin/deposit/get-deposit-details",  // GET /admin/deposit/ge
   FETCH_WALLET_ACCOUNTS: "/admin/actions/fetch-wallet-ccounts", // GET /<string:wallet_id>
   FETCH_KYC_DOCUMENTS: "/admin/actions/fetch_kyc_documents", // GET /<string:user_id>
   FETCH_VIRTUAL_ACCOUNTS: "/admin/fetch-virtual-accounts", // GET /<string:wallet_id>
+  FETCH_PROVIDER_BALANCES: '/admin/fetch-provider-balances', // GET
 
 };
