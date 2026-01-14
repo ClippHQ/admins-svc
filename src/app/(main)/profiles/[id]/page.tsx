@@ -265,13 +265,12 @@ export default function ProfileDetailsPage() {
                                 data={virtualAccounts?.data ?? [] as VirtualAccount[]}
                                 loading={virtualAccounts?.status === 'pending'}
                                 columnRender={{
+                                    created_at: "datetime",
                                     account_name: 'text',
                                     account_number: 'text',
                                     bank_name: 'text',
                                     currency: 'text',
                                     provider: 'text',
-                                    routing_number: (item) => item.routing_number || '-',
-                                    wire_routing_number: (item) => item.wire_routing_number || '-',
 
                                     status: 'text',
 
@@ -283,6 +282,7 @@ export default function ProfileDetailsPage() {
                                 <GenericTableGenerator
                                     data={infiniteData.data ?? []}
                                     columnRender={{
+                                         created_at: "datetime",
                                         amount: "amount",
                                         status: "text",
                                         description: "text"

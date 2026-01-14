@@ -316,6 +316,7 @@ export default function DepositDetailsPage() {
                                 <GenericTableGenerator
                                     data={infiniteData.data ?? []}
                                     columnRender={{
+                                        created_at: "datetime",
                                         amount: "amount",
                                         status: "text",
                                         description: "text"
