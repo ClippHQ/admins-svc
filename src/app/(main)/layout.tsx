@@ -10,6 +10,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   const navLinks = [
     { name: "Dashboard", href: "/dashboard" },
+    { name: "Profiles", href: "/profiles" },
     { name: "Applications", href: "/applications" },
     { name: "Deposits", href: "/deposits" },
     { name: "Payouts", href: "/payouts" },
