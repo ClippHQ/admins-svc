@@ -234,7 +234,7 @@ export default function ProfileDetailsPage() {
                                                                                  <Button disabled={!profile?.user?.is_flagged} onClick={() => openAlertDialog('activate')}>
                                                                                 Activate Profile
                                                                             </Button>
-                                                                 <Button  color="error" onClick={() => openAlertDialog('deactivate')}>
+                                                                 <Button disabled={!!profile?.user?.is_flagged}  color="error" onClick={() => openAlertDialog('deactivate')}>
                                                                                Deactivate Profile
                                                                             </Button>
                                                                             {activateDeactivateUserAccountMtn.isPending ? <CircularProgress size={24} /> : null}

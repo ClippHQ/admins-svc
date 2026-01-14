@@ -238,7 +238,7 @@ export default function DepositDetailsPage() {
                                     <Grid container>
                                         <Grid size={4} >
                                             <Typography variant="subtitle2">Date</Typography>
-                                            <Typography textTransform="capitalize" variant="body1" fontWeight="bold">{format(deposit?.deposit?.created_at || new Date(), "dd MMM, yyyy")}</Typography>
+                                            <Typography textTransform="capitalize" variant="body1" fontWeight="bold">{format(deposit?.deposit?.created_at || new Date(), "dd MMM, yyyy. HH:mm")}</Typography>
                                         </Grid>
                                         <Grid size={4} >
                                             <Typography variant="subtitle2">Currency</Typography>

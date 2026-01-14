@@ -68,7 +68,7 @@ export default function DashboardPage() {
                                     <GenericTableGenerator
                                         data={payouts}
                                         columnRender={{
-                                            created_at: 'date',
+                                            created_at: 'datetime',
                                             account_name: 'text',
                                             currency_source: 'text',
                                             amount_source: (value) => {
@@ -85,6 +85,7 @@ export default function DashboardPage() {
                                                     withDecimals: true
                                                 })
                                             },
+                                            status: 'text',
 
 
                                         }}

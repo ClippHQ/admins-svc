@@ -20,7 +20,7 @@ function titleCase(str: string): string {
       .join(' ');
   }
 
-type TableCellType<T extends GridValidRowModel> = "text" | "date" | "amount" | ((value: T) => React.ReactNode);
+type TableCellType<T extends GridValidRowModel> = "text" | "date" | "amount" | "datetime" | ((value: T) => React.ReactNode);
 interface GenericTableGeneratorProps<T extends GridValidRowModel> {
   data: T[];
   renderedFields?: (keyof T)[];
@@ -50,6 +50,8 @@ export function GenericTableGenerator<T extends GridValidRowModel>({ data, colum
                         return value
                     case 'date':
                         return value ? format((value as string), 'dd MMM, yyyy') : '-';
+                    case 'datetime':
+                        return value ? format((value as string), 'dd MMM, yyyy HH:mm') : '-';
                     case 'amount':
                         return formatAmount({
                             amount: Number(value) / 100,

@@ -73,7 +73,7 @@ export default function DashboardPage() {
                     amount: 'amount',
                     provider: 'text',
                     status: 'text',
-                    created_at: 'date',
+                    created_at: 'datetime',
                     currency: 'text',
                     payer: (value) => {
                       if(value.transaction_object?.payer) {
