@@ -106,8 +106,13 @@ export type User = {
   id: string;
   profile_id: string;
   status: "pending" | "verified" | "restricted";
+  is_flagged:  number;  // 0 or 1
+  wallet_id: string;
+  kyc_verification_id: string;
+  
   referral_code: string
   pin?: string;
+
 };
 export type Profile = {
   created_at: string;
@@ -166,10 +171,67 @@ export interface Wallet {
     brails_id: string | null;
 }
 
+export interface CryptoCurrency {
+  provider: string;
+  provider_code?: string;
+  code: string;
+  name: string;
+  status: string;
+  white_paper: string;
+  meta_data: string;
+  created_at: string;
+  id: string;
+  updated_at: string;
+}
+
+export interface WalletAccount {
+  id: string;
+  currency: string;
+  status: 'active' | 'locked' | 'disabled';
+  type: 'banking' | 'yield' | 'crypto-currency';
+  balance_ledger: number;
+  balance_available: number;
+  earnings: number;
+  lock_start: string;
+  lock_end: string;
+  created_datetime: string;
+  updated_datetime: string;
+  crypto_currency?: CryptoCurrency;
+};
 export type PaginatedResponse<T> = {
     payload: T[];
     "total": number;
     "size": number
     "rows": number;
     "page": number
+};
+
+
+type AddressObject = {
+    city: string;
+    line1: string;
+    state: string;
+    country: string;
+    postal_code: string;
+
+}
+export interface VirtualAccount {
+  id: string;
+  wallet_id: string;
+  provider: string;
+  provider_code?: string;
+  account_name?: string;
+  account_number?: string;
+  iban?: string;
+  bank_name?: string;
+  bank_code?: string;
+  swift_code?: string;
+  sort_code?: string;
+  bank_address?: AddressObject;
+  currency: "NGN" | "USD" | "GBP" | "CAD";
+  status: "pending" | "active" | "suspended" | 'failed' | 'empty';
+  created_at: string;
+  updated_at: string;
+  routing_number?: string;
+  wire_routing_number?: string;
 };

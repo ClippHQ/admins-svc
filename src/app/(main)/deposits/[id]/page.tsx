@@ -18,6 +18,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useTransactions } from "src/api/transactions";
 import { GenericTableGenerator } from "src/components/generic-table-generator";
+import Link from "next/link";
 
 function AlertDialog({open, onConfirm, onCancel, message, title = "Confirm Action"}: {open: boolean; onConfirm: () => void; onCancel: () => void; message: string; title?: string}) {
 
@@ -206,6 +207,12 @@ export default function DepositDetailsPage() {
                             </Grid>
 
                         </Grid>
+
+                     {!!deposit?.profile?.user_id && (   <Link href={`/profiles/${deposit?.profile?.user_id}`}>
+                            <Button variant="outlined">
+                                View Full Profile
+                            </Button>
+                        </Link>)}
 
                  <Divider />
                     </Box>

@@ -1,8 +1,8 @@
-import { useInfiniteQuery, InfiniteData } from "@tanstack/react-query";
+import { useInfiniteQuery, InfiniteData, useQuery, useMutation } from "@tanstack/react-query";
 import { useCallback } from "react";
 import apiClient from "src/services/apiService";
 import { API_ENDPOINTS } from "src/services/endpointDefinition";
-import { PaginatedResponse, Payout, TransactionWA } from "src/types";
+import { PaginatedResponse, Payout, TransactionWA, VirtualAccount, WalletAccount } from "src/types";
 
 
 
@@ -91,4 +91,50 @@ export function usePayouts(limit = 20) {
         rawData: infiniteQueryResponse.data,
         data: payouts,
     }
+}
+
+
+export function useWalletAccounts(wallet_id: string = '') {
+
+    const fetchWalletAccounts = async (wallet_id: string) => {
+        const res = await apiClient.get(`${API_ENDPOINTS.FETCH_WALLET_ACCOUNTS}/${wallet_id}`);
+  
+        return res.data.data as WalletAccount[];
+    }
+
+    return useQuery<WalletAccount[], Error>({
+        queryKey: ['fetch-wallet-accounts', wallet_id],
+        queryFn: () => fetchWalletAccounts(wallet_id),
+        enabled: !!wallet_id, // only run the query if wallet_id is provided
+    });
+
+}
+
+export function useVirtualAccounts(wallet_id: string = '') {
+
+    const fetchVirtualAccounts = async (wallet_id: string) => {
+        const res = await apiClient.get(`${API_ENDPOINTS.FETCH_VIRTUAL_ACCOUNTS}/${wallet_id}`);
+  
+        return res.data.data as VirtualAccount[];
+    }
+
+    return useQuery<VirtualAccount[], Error>({
+        queryKey: ['fetch-virtual-accounts', wallet_id],
+        queryFn: () => fetchVirtualAccounts(wallet_id),
+        enabled: !!wallet_id, // only run the query if wallet_id is provided
+    });
+
+}
+
+
+export function useAddRemovePayoutLien() {
+    const addRemovePayoutLien = async (payload: {wallet_id: string; action: 'add' | 'remove'}) => {
+        const res = await apiClient.post(API_ENDPOINTS.ADD_REMOVE_PAYOUT_LIEN + '/' + payload.wallet_id, { action: payload.action });
+        return res.data;
+    }
+
+    return useMutation({
+        mutationFn: addRemovePayoutLien,
+        mutationKey: ['add-remove-payout-lien'],
+    });
 }

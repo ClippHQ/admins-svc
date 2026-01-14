@@ -35,7 +35,7 @@ interface GenericTableGeneratorProps<T extends GridValidRowModel> {
 export function GenericTableGenerator<T extends GridValidRowModel>({ data, columnRender, renderedFields, paginationModel: model = {
     page: 1,
     pageSize: 20
-}, infiniteQueryResult, onRowClick }: GenericTableGeneratorProps<T>) {
+}, infiniteQueryResult, loading, onRowClick }: GenericTableGeneratorProps<T>) {
     const fieldsToRender = renderedFields || (Object.keys(columnRender) as (keyof T)[]);
 
     const columns: GridColDef[] = fieldsToRender.map((field) => {
@@ -122,7 +122,7 @@ export function GenericTableGenerator<T extends GridValidRowModel>({ data, colum
     return (
         <DataGrid rowCount={tableMeta.totalRows} rows={rows} columns={columns} paginationModel={tableMeta.paginationModel} paginationMeta={{
             hasNextPage: infiniteQueryResult?.hasNextPage || false,
-        }} paginationMode="server" onPaginationModelChange={handlePaginationModelChange} loading={!!(infiniteQueryResult?.isLoading || infiniteQueryResult?.isFetching || infiniteQueryResult?.isFetchingNextPage)} 
+        }} paginationMode="server" onPaginationModelChange={handlePaginationModelChange} loading={!!(infiniteQueryResult?.isLoading || infiniteQueryResult?.isFetching || infiniteQueryResult?.isFetchingNextPage || loading)} 
         onRowClick={(params)  => onRowClick?.(params.row as T)}
         />
     )
