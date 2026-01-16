@@ -176,21 +176,7 @@ export default function DashboardPage() {
                 
                 <div className="flex flex-row gap-x-3 gap-y-2 flex-wrap">
                   {balances.map((balanceItem, index) => (<ProviderBalanceCard key={`provider-${index+1}`} {...balanceItem}  />))}
-                  <Card>
-                        <CardContent>
-      <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
-        Graph
-      </Typography>
-      <Typography variant="h5" component="div">
-        {formatAmount({
-          amount: 120000/100,
-          currency: 'USD',
-        })}
-      </Typography>
-      <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>USD</Typography>
-    </CardContent>
-
-                  </Card>
+         
                 </div>
               </Paper>
               <Card className="shadow-sm">
