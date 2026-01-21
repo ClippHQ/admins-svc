@@ -318,6 +318,7 @@ export default function DepositDetailsPage() {
                                     columnRender={{
                                         created_at: "datetime",
                                         amount: "amount",
+                                        kind: "text",
                                         status: "text",
                                         description: "text"
                                     }}
