@@ -2,7 +2,7 @@ import { GridColDef, GridValidRowModel, GridPaginationModel, GridFilterModel, Gr
 import { DataGrid } from "@mui/x-data-grid";
 import { InfiniteData, UseInfiniteQueryResult } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { formatAmount } from "src/lib/amount";
 import { PaginatedResponse } from "src/types";
 
@@ -53,6 +53,7 @@ export function GenericTableGenerator<T extends GridValidRowModel>({ data, onFil
     
 }, infiniteQueryResult, loading, onRowClick }: GenericTableGeneratorProps<T>) {
     const fieldsToRender = renderedFields || (Object.keys(columnRender) as (keyof T)[]);
+    const [currentPage, setCurrentPage] = React.useState(1)
 
     const columns: GridColDef[] = fieldsToRender.map((field) => {
         const renderType = columnRender[field];
@@ -104,24 +105,32 @@ export function GenericTableGenerator<T extends GridValidRowModel>({ data, onFil
         if(!infiniteQueryResult?.rawData?.pages) {
             return data.map((item, index) => ({id: index + 1, ...item}))
         }
+        const currentPageData = infiniteQueryResult.rawData.pages[Math.max(currentPage -1)];
+        if(!currentPageData) return [];
 
-        const lastPage = infiniteQueryResult.rawData.pages[infiniteQueryResult.rawData.pages.length -1];
+
+   
         const startingIndex = 0;
-        const pageData = lastPage.payload.map((item, index) => ({id: startingIndex + index +1, ...item}));
+        const pageData = currentPageData.payload.map((item, index) => ({id: startingIndex + index +1, ...item}));
         return pageData;
-    }, [data, infiniteQueryResult])
+    }, [data, infiniteQueryResult, currentPage])
 
 
         const handlePaginationModelChange = useCallback((newPaginationModel: GridPaginationModel) => {
     // We have the cursor, we can allow the page transition.
             if(!infiniteQueryResult?.rawData?.pages) return;
-            const lastPage = infiniteQueryResult?.rawData?.pages[infiniteQueryResult.rawData.pages.length -1];
-            if(lastPage.page - 1 < newPaginationModel.page){
+            const lastPage = currentPage
+            if(lastPage - 1 < newPaginationModel.page){
                 console.log('fetch next page', infiniteQueryResult?.hasNextPage)
                 if(!infiniteQueryResult?.hasNextPage) return;
+                
                 infiniteQueryResult.fetchNextPage();
+                setCurrentPage(lastPage + 1);
+            } else if(lastPage - 1 > newPaginationModel.page){
+                // Going back to previous page
+                setCurrentPage(lastPage - 1);
             }
-  }, [infiniteQueryResult]);
+  }, [infiniteQueryResult, currentPage]);
      
     const tableMeta = useMemo(() => {
         if(!infiniteQueryResult?.rawData?.pages) {
@@ -133,18 +142,18 @@ export function GenericTableGenerator<T extends GridValidRowModel>({ data, onFil
 
                const raw: TransformedUseQueryResult<T>['rawData'] = infiniteQueryResult?.rawData;
         const totalRows = raw?.pages[0]?.total || 0;
-           const lastPage = raw?.pages[raw?.pages.length -1];
+
 
 
            return {
             totalRows,
             paginationModel: {
-                page: lastPage.page - 1,
+                page: currentPage - 1,
                 pageSize: model.pageSize
             }
            }
         }
-    }, [data, infiniteQueryResult, model]);
+    }, [data, infiniteQueryResult, currentPage, model]);
 
      
 
