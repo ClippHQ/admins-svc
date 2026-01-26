@@ -6,9 +6,9 @@ import { Deposit, KYCVerification, PaginatedResponse, Profile, Wallet } from "sr
 
 type FetchDepositResponse = {deposit: Deposit; profile: Profile; wallet: Wallet; kyc_verification: KYCVerification}
 
-export function useDeposits(limit = 20) {
+export function useDeposits({limit = 20, status = 'all'}: {limit?: number, status?: string}) {
     async function fetchDeposit(pageNumber: number, limitNumber: number) {
-        const res = await apiClient.get(`${API_ENDPOINTS.ALL_DEPOSITS}?page=${pageNumber}&limit=${limitNumber}`);
+        const res = await apiClient.get(`${API_ENDPOINTS.ALL_DEPOSITS}?page=${pageNumber}&limit=${limitNumber}${status && status !== 'all' ? `&status=${status}` : ''}`);
         return res.data as PaginatedResponse<Deposit>;
 
 
@@ -27,7 +27,7 @@ export function useDeposits(limit = 20) {
 
    const infiniteQueryResponse = useInfiniteQuery({
                 initialPageParam: 1,
-            queryKey: ['fetch-all-deposits'],
+            queryKey: ['fetch-all-deposits', status],
 
             queryFn: ({ pageParam = 1 }) => fetchDeposit(pageParam, limit),
             getNextPageParam: (lastPage) => {

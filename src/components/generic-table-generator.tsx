@@ -1,4 +1,4 @@
-import { GridColDef, GridValidRowModel, GridPaginationModel } from "@mui/x-data-grid";
+import { GridColDef, GridValidRowModel, GridPaginationModel, GridFilterModel, GridFilterItem, GridFilterOperator } from "@mui/x-data-grid";
 import { DataGrid } from "@mui/x-data-grid";
 import { InfiniteData, UseInfiniteQueryResult } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -20,21 +20,37 @@ export function titleCase(str: string): string {
       .join(' ');
   }
 
+
+
 type TableCellType<T extends GridValidRowModel> = "text" | "date" | "amount" | "datetime" | ((value: T) => React.ReactNode);
+
+interface KiteGridFilterItem<T extends GridValidRowModel> extends Omit<GridFilterItem, 'field'> {
+    field: keyof T & string;
+}
+interface KiteGridFilterModel<T extends GridValidRowModel> extends Omit<GridFilterModel, 'items'> {
+    items: KiteGridFilterItem<T>[];
+
+}
 interface GenericTableGeneratorProps<T extends GridValidRowModel> {
   data: T[];
+  
   renderedFields?: (keyof T)[];
   columnRender: Partial<Record<keyof T, TableCellType<T>>>;
   loading?: boolean;
     paginationModel?: GridPaginationModel;
   infiniteQueryResult?: TransformedUseQueryResult<T>;
+  filterModel?: KiteGridFilterModel<T>;
   onRowClick?: (row: T) => void;
+  customFilterOperators?: Partial<Record<keyof T, GridFilterOperator<T, number | string | boolean>[]>>;
+  filterableColumns?: (keyof T)[];
+  onFilterChanged?: (filterValues: Partial<T>) => void;
 }
 
 
-export function GenericTableGenerator<T extends GridValidRowModel>({ data, columnRender, renderedFields, paginationModel: model = {
+export function GenericTableGenerator<T extends GridValidRowModel>({ data, onFilterChanged, customFilterOperators, filterableColumns, columnRender, renderedFields, filterModel, paginationModel: model = {
     page: 1,
-    pageSize: 20
+    pageSize: 20,
+    
 }, infiniteQueryResult, loading, onRowClick }: GenericTableGeneratorProps<T>) {
     const fieldsToRender = renderedFields || (Object.keys(columnRender) as (keyof T)[]);
 
@@ -62,11 +78,23 @@ export function GenericTableGenerator<T extends GridValidRowModel>({ data, colum
                 }
             }
         }
+        const canBeFiltered = filterableColumns ? filterableColumns.includes(field) : true;
+        if(customFilterOperators && customFilterOperators[field]) {
+            return {
+                field: field as string,
+                headerName: titleCase(field as string),
+                flex: 1,
+                valueGetter,
+                filterOperators: customFilterOperators[field],
+                filterable: canBeFiltered
+            } as GridColDef<T>;
+        }
         return {
                 field: field as string,
                 headerName: titleCase(field as string),
                 flex: 1,
-                valueGetter
+                valueGetter,
+                filterable: canBeFiltered
         } as GridColDef<T>;
        
         
@@ -126,6 +154,18 @@ export function GenericTableGenerator<T extends GridValidRowModel>({ data, colum
             hasNextPage: infiniteQueryResult?.hasNextPage || false,
         }} paginationMode="server" onPaginationModelChange={handlePaginationModelChange} loading={!!(infiniteQueryResult?.isLoading || infiniteQueryResult?.isFetching || infiniteQueryResult?.isFetchingNextPage || loading)} 
         onRowClick={(params)  => onRowClick?.(params.row as T)}
+        
+        filterMode="server"
+        showToolbar={!!filterModel}
+        onFilterModelChange={(model) => {
+            const filterValues: Partial<T> = {};
+            model.items.forEach((item) => {
+                if(item.value !== undefined && item.value !== null && item.value !== '') {
+                    filterValues[item.field as keyof T] = item.value as T[keyof T];
+                }
+            });
+            onFilterChanged?.(filterValues);
+        }}
         />
     )
 }
