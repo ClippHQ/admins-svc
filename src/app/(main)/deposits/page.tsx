@@ -5,53 +5,15 @@ import {
   CardContent,
   Typography,
   Alert,
-  Autocomplete,
-  TextField,
 } from "@mui/material";
 import { Deposit } from "src/types";
 import { useDeposits } from "src/api/deposit";
 import { useRouter } from "next/navigation";
 import { GenericTableGenerator } from "src/components/generic-table-generator";
-import { GridFilterInputValueProps, GridFilterOperator } from "@mui/x-data-grid";
 import React, { useState } from "react";
+import { statusQueryOperator } from "src/components/status-query-operator";
 
-function StatusFilterInput(props: GridFilterInputValueProps) {
-    const { item, applyValue, focusElementRef } = props;
 
-React.useImperativeHandle(focusElementRef, () => ({
-  focus: () => {
-    document.getElementById('status-filter-input')?.focus();
-  },
-}));
-  return (
-    <Autocomplete
-  disablePortal
-  onChange={(e, v) => {
-    applyValue({ ...item, value: v });
-  }}
-  options={['pending', 'successful', 'failed', 'rejected', 'in_review', 'all']}
-  sx={{  }}
-  id="status-filter-input"
-
-  renderInput={(params) => <TextField {...params} label="Status" />}
-/>
-  )
-}
-
-const statusGridFilterOperator: GridFilterOperator<Deposit, string | number | boolean>[] = [{
-  label: "Status Equals",
-  value: 'status_equals',
-  getApplyFilterFn: (filterItem) => {
-    if (!filterItem.value || typeof filterItem.value !== 'string') {
-      return null;
-    }
-    return (value) => {
-      return String(value).toLowerCase() === String(filterItem.value).toLowerCase();
-    }
-  },
-  InputComponent: StatusFilterInput,
-  requiresFilterValue: true,
-}]
 
 export default function DashboardPage() {
 
@@ -128,7 +90,7 @@ export default function DashboardPage() {
                     }
                   }}
                   customFilterOperators={{
-                    status: statusGridFilterOperator
+                    status: statusQueryOperator<Deposit, Deposit['status'] | 'all'>(['in_review', 'rejected', 'pending', 'successful', 'failed', 'all'])
                   }}
                   filterModel={{
                     items: [
@@ -141,7 +103,6 @@ export default function DashboardPage() {
                     ]
                   }}
                   onFilterChanged={(d) => {
-                    console.log("ran", d)
                     if(d.status) {
                       setStatusFilter(d.status as Deposit['status'])
                     }

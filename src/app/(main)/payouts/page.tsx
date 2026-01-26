@@ -17,9 +17,11 @@ import { Payout } from "src/types";
 import { formatAmount } from "src/lib/amount";
 import { usePayouts } from "src/api/transactions";
 import { GenericTableGenerator } from "src/components/generic-table-generator";
+import { statusQueryOperator } from "src/components/status-query-operator";
 
 export default function DashboardPage() {
-    const infiniteData = usePayouts(30);
+    const [statusFilter, setStatusFilter] = useState<Payout['status'] | 'all'>('all')
+    const infiniteData = usePayouts({ limit: 30, status: statusFilter });
     const { data: payouts, error: queryError } = infiniteData;
 
 
@@ -89,12 +91,31 @@ export default function DashboardPage() {
 
 
                                         }}
+                                        customFilterOperators={{
+                                            status: statusQueryOperator<Payout, Payout['status'] | 'all'>(['all' ,'pending', 'successful', 'failed'])
+                                        }}
+                                        onFilterChanged={(d) => {
+                                            if (d.status) {
+                                                setStatusFilter(d.status as Payout['status'] | 'all')
+                                            }
+                                        }}
+                                        filterModel={{
+                                            items: [
+                                                {
+                                                    field: 'status',
+                                                    operator: 'status_equals',
+                                                    value: 'in_review'
+
+                                                }
+                                            ]
+                                        }}
                                         onRowClick={handleRowClick}
                                         infiniteQueryResult={infiniteData}
                                         paginationModel={{
                                             page: 0,
                                             pageSize: 30
                                         }}
+                                        filterableColumns={['status']}
                                     />
                                 </CardContent>
                             </Card>

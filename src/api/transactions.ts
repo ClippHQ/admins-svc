@@ -52,9 +52,9 @@ export function useTransactions({
 }
 
 
-export function usePayouts(limit = 20) {
+export function usePayouts({limit = 20, status = 'all'}: {limit?: number, status?: string}) {
     async function fetchWATransactions(pageNumber: number, limitNumber: number) {
-        const res = await apiClient.get(`${API_ENDPOINTS.ALL_PAYOUTS}?page=${pageNumber}&limit=${limitNumber}`);
+        const res = await apiClient.get(`${API_ENDPOINTS.ALL_PAYOUTS}?page=${pageNumber}&limit=${limitNumber}${status && status !== 'all' ? `&status=${status}` : ''}`);
         return res.data as PaginatedResponse<Payout>;
 
 
@@ -72,7 +72,7 @@ export function usePayouts(limit = 20) {
 
    const infiniteQueryResponse = useInfiniteQuery({
                 initialPageParam: 1,
-            queryKey: ['fetch-all-payouts'],
+            queryKey: ['fetch-all-payouts', status],
 
             queryFn: ({ pageParam = 1 }) => fetchWATransactions(pageParam, limit),
             getNextPageParam: (lastPage) => {
