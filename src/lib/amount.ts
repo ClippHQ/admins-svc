@@ -85,7 +85,7 @@ export const CURRENCY_SYMBOL_MAP: Record<
   TZS: { position: 'prefix', symbol: 'TZS' },
   UGX: { position: 'prefix', symbol: 'USh' },
   USD: { position: 'prefix', symbol: '$' },
-  USDC: { position: 'prefix', symbol: '' },
-  USDT: { position: 'prefix', symbol: '' },
+  USDC: { position: 'prefix', symbol: '$' },
+  USDT: { position: 'prefix', symbol: '$' },
   ZMW: { position: 'prefix', symbol: 'ZMW' }
 };
