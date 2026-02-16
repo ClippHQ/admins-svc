@@ -17,17 +17,18 @@ import { statusQueryOperator } from "src/components/status-query-operator";
 
 export default function DashboardPage() {
 
-  const [statusFilter, setStatusFilter] = useState<Deposit['status'] | 'all'>('in_review')
+  const [filterDict, setFilterDict] = useState({} as Partial<Record<string, string>>);
   const router = useRouter()
 
 
+  
 
-    const infiniteQueryResult = useDeposits({limit: 30, status: statusFilter});
+
+    const infiniteQueryResult = useDeposits({limit: 30, filterDict});
     const {data: deposits, error: queryError } = infiniteQueryResult;
 
 
     
-
   // Modal handler
 
   const error = queryError ? (queryError as Error).message ?? 'Something went wrong' : null;
@@ -90,7 +91,8 @@ export default function DashboardPage() {
                     }
                   }}
                   customFilterOperators={{
-                    status: statusQueryOperator<Deposit, Deposit['status'] | 'all'>(['in_review', 'rejected', 'pending', 'successful', 'failed', 'all'])
+                    status: statusQueryOperator<Deposit, Deposit['status'] | 'all'>(['in_review', 'rejected', 'pending', 'successful', 'failed', 'all']),
+                    provider: statusQueryOperator<Deposit, Deposit['provider'] | 'all'>(['all', 'graph', 'noah', 'quidax', 'fincra', 'paystack', 'flutterwave'])
                   }}
                   filterModel={{
                     items: [
@@ -99,12 +101,20 @@ export default function DashboardPage() {
                         operator: 'status_equals',
                         value: 'in_review'
 
+                      }, 
+                      {
+                        field: 'provider',
+                        operator: 'provider_equals',
+                        value: 'all'
                       }
                     ]
                   }}
                   onFilterChanged={(d) => {
-                    if(d.status) {
-                      setStatusFilter(d.status as Deposit['status'])
+                    if(d.status || d.provider) {
+                      setFilterDict({
+                        status: d.status as Deposit['status'] | 'all' || filterDict['status'],
+                        provider: d.provider as Deposit['provider'] | 'all' || filterDict['provider']
+                      })
                     }
                   }}
                   onRowClick={handleRowClick}
@@ -113,7 +123,7 @@ export default function DashboardPage() {
                     page: 0,
                     pageSize: 30
                   }}
-                  filterableColumns={['status']}
+                  filterableColumns={['status', 'provider']}
 
                   
                   />

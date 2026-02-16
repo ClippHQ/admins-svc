@@ -4,11 +4,20 @@ import apiClient from "src/services/apiService";
 import { API_ENDPOINTS } from "src/services/endpointDefinition";
 import { Deposit, KYCVerification, PaginatedResponse, Profile, Wallet } from "src/types";
 
+function resolveFilter(filterValue: string, filterKey: string, ) {
+    if (filterValue === 'all' || !filterValue) return '';
+    return `&${filterKey}=${filterValue}`;
+}
+
 type FetchDepositResponse = {deposit: Deposit; profile: Profile; wallet: Wallet; kyc_verification: KYCVerification}
 
-export function useDeposits({limit = 20, status = 'all'}: {limit?: number, status?: string}) {
+export function useDeposits({limit = 20, filterDict = {
+    status: 'all',
+    provider: 'all'
+}}: {limit?: number, filterDict: Partial<Record<string, string>>}) {
     async function fetchDeposit(pageNumber: number, limitNumber: number) {
-        const res = await apiClient.get(`${API_ENDPOINTS.ALL_DEPOSITS}?page=${pageNumber}&limit=${limitNumber}${status && status !== 'all' ? `&status=${status}` : ''}`);
+
+        const res = await apiClient.get(`${API_ENDPOINTS.ALL_DEPOSITS}?page=${pageNumber}&limit=${limitNumber}` + Object.entries(filterDict).map(([key, value]) => resolveFilter(value!, key)).join(''));
         return res.data as PaginatedResponse<Deposit>;
 
 
@@ -27,7 +36,7 @@ export function useDeposits({limit = 20, status = 'all'}: {limit?: number, statu
 
    const infiniteQueryResponse = useInfiniteQuery({
                 initialPageParam: 1,
-            queryKey: ['fetch-all-deposits', status],
+            queryKey: ['fetch-all-deposits', filterDict],
 
             queryFn: ({ pageParam = 1 }) => fetchDeposit(pageParam, limit),
             getNextPageParam: (lastPage) => {
