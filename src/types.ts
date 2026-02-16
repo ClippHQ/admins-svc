@@ -105,7 +105,7 @@ export type User = {
   updated_at: string;
   id: string;
   profile_id: string;
-  status: "pending" | "verified" | "restricted";
+  status: "pending" | "verified" | "restricted" | 'deleted';
   is_flagged:  number;  // 0 or 1
   wallet_id: string;
   kyc_verification_id: string;

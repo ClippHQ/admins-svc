@@ -159,6 +159,7 @@ export default function ProfileDetailsPage() {
         setAction(actionType);
         setAlertDialogOpen(true);
     }
+    const userDeactivated = (profile?.user?.is_flagged === 1 || profile?.user?.status === 'deleted');
     return (
         <div>
             <h1>Profile Details for ID: {params?.id || 'undefined'}</h1>
@@ -231,10 +232,10 @@ export default function ProfileDetailsPage() {
                                                                             <ProfileStatus status={!!profile?.user?.is_flagged ? 'flagged' : 'active'} />
                                                           
                                                             <Box flexDirection="row" display="flex" columnGap="16px" >
-                                                                                 <Button disabled={!profile?.user?.is_flagged} onClick={() => openAlertDialog('activate')}>
+                                                                                 <Button disabled={userDeactivated} onClick={() => openAlertDialog('activate')}>
                                                                                 Activate Profile
                                                                             </Button>
-                                                                 <Button disabled={!!profile?.user?.is_flagged}  color="error" onClick={() => openAlertDialog('deactivate')}>
+                                                                 <Button disabled={!userDeactivated}  color="error" onClick={() => openAlertDialog('deactivate')}>
                                                                                Deactivate Profile
                                                                             </Button>
                                                                             {activateDeactivateUserAccountMtn.isPending ? <CircularProgress size={24} /> : null}
