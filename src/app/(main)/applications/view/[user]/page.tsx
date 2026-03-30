@@ -1,4 +1,5 @@
 // next/link not used here
+import Head from 'next/head';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
@@ -8,6 +9,13 @@ import Avatar from '@mui/material/Avatar';
 export default function ApplicationDetail() {
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark text-[#111318] dark:text-white">
+      <Head>
+        <title>Application Details - Kite Admin Dashboard</title>
+        <meta
+          name="description"
+          content="Review detailed account application information in the Kite admin dashboard."
+        />
+      </Head>
       <div className="mx-auto max-w-7xl px-6 py-6">
         <header className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-4">
           <div className="flex items-center gap-4">

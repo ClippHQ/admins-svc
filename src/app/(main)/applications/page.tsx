@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import Link from 'next/link';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -35,6 +36,13 @@ function StatusBadge({ status }: { status: string }) {
 export default function ApplicationsList() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50">
+      <Head>
+        <title>Applications - Kite Admin Dashboard</title>
+        <meta
+          name="description"
+          content="Review submitted account applications in the Kite admin dashboard."
+        />
+      </Head>
       <div className="mx-auto max-w-6xl px-6 py-6">
         <div className="flex items-center justify-between mb-6">
           <div>

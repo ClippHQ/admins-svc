@@ -19,6 +19,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useTransactions } from "src/api/transactions";
 import { GenericTableGenerator } from "src/components/generic-table-generator";
 import Link from "next/link";
+import Head from "next/head";
 
 function AlertDialog({open, onConfirm, onCancel, message, title = "Confirm Action"}: {open: boolean; onConfirm: () => void; onCancel: () => void; message: string; title?: string}) {
 
@@ -163,7 +164,20 @@ export default function DepositDetailsPage() {
         setAction(actionType);
         setAlertDialogOpen(true);
     }
+    let titleText = 'Unavailable'
+     if(deposit) {
+        titleText = `${formatAmount({
+                                                amount: deposit?.deposit?.amount ? deposit?.deposit?.amount / 100 : 0,
+                                                withDecimals: true,
+                                                currency: deposit?.deposit?.currency ?? 'USD',
+                                            })} by ${deposit.profile?.name_first ?? ''} ${deposit.profile?.name_last ?? ''}`
+     }
     return (
+        <>
+        <Head>
+            <title>Deposit Details - {loading ? 'Loading...' : titleText}</title>
+            <meta name="description" content={`Detailed information about deposit ID: ${params?.id}. View user info, transaction history, and manage the deposit status.`} />
+        </Head>
         <div>
             <h1>Deposit Details for ID: {params?.id || 'undefined'}</h1>
 
@@ -365,6 +379,7 @@ export default function DepositDetailsPage() {
       </Snackbar>
             {/* Additional details can be fetched and displayed here using the useDeposit hook */}
         </div>
+        </>
     );
 
 

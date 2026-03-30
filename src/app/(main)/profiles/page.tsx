@@ -1,5 +1,6 @@
 "use client";
 
+import Head from "next/head";
 import {
   Card,
   CardContent,
@@ -38,6 +39,13 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50">
+      <Head>
+        <title>Profiles - Kite Admin Dashboard</title>
+        <meta
+          name="description"
+          content="Browse and review user profiles in the Kite admin dashboard."
+        />
+      </Head>
       <div className="mx-auto max-w-7xl px-4 py-6">
         <div className="grid grid-cols-12 gap-6">
           {/* Main content */}
