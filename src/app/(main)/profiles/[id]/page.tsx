@@ -1,6 +1,7 @@
 
 "use client";
 
+import Head from "next/head";
 import { Alert, Box, Button, Chip, CircularProgress, Container, Divider, Grid, Paper, Snackbar, Typography } from "@mui/material";
 import { useParams } from "next/navigation";
 import { useActivateDeactivateUserAccount, useProfile } from "src/api/profiles";
@@ -162,6 +163,13 @@ export default function ProfileDetailsPage() {
     const userDeactivated = (profile?.user?.is_flagged === 1 || profile?.user?.status === 'deleted');
     return (
         <div>
+            <Head>
+                <title>Profile Details - Kite Admin Dashboard</title>
+                <meta
+                    name="description"
+                    content={`Detailed profile information for user ${params?.id ?? ''} in the Kite admin dashboard.`}
+                />
+            </Head>
             <h1>Profile Details for ID: {params?.id || 'undefined'}</h1>
 
             <Container>
