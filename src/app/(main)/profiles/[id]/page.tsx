@@ -5,7 +5,7 @@ import Head from "next/head";
 import { Alert, Box, Button, Chip, CircularProgress, Container, Divider, Grid, Paper, Snackbar, Typography } from "@mui/material";
 import { useParams } from "next/navigation";
 import { useActivateDeactivateUserAccount, useProfile } from "src/api/profiles";
-import { VirtualAccount, WalletAccount } from "src/types";
+import { KycVerificationDocument, VirtualAccount, WalletAccount } from "src/types";
 
 import * as React from 'react';
 import Tabs from '@mui/material/Tabs';
@@ -195,6 +195,7 @@ export default function ProfileDetailsPage() {
                                     <Tab label="Wallet Accounts" {...a11yProps(1)} />
                                     <Tab label="Virtual Accounts" {...a11yProps(2)} />
                                     <Tab label="Transaction History" {...a11yProps(3)} />
+                                    <Tab label="KYC Documents" {...a11yProps(4)} />
 
 
                                 </Tabs>
@@ -306,6 +307,22 @@ export default function ProfileDetailsPage() {
                                 />
                             </CustomTabPanel>
 
+
+                            <CustomTabPanel value={value} index={4}>
+                                <GenericTableGenerator
+                                    data={profile?.kyc_verification_documents ?? [] as KycVerificationDocument[]}
+                                    columnRender={{
+                                        id_type: 'text',
+                                        id_number: 'text',
+                                        id_issued_by: 'text',
+                                        id_country: 'text',
+                                        id_issue_date: 'text',
+                                        id_expiry_date: 'text',
+                                        status: 'text',
+                                        created_at: 'datetime',
+                                    }}
+                                />
+                            </CustomTabPanel>
 
                         </Box>
                     </Box>

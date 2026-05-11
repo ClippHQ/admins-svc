@@ -3,12 +3,13 @@ import { useQuery, useMutation, useInfiniteQuery, InfiniteData } from "@tanstack
 import { useCallback } from "react";
 import apiClient from "src/services/apiService";
 import { API_ENDPOINTS } from "src/services/endpointDefinition";
-import { KYCVerification, PaginatedResponse, Profile, User } from "src/types";
+import { KYCVerification, KycVerificationDocument, PaginatedResponse, Profile, User } from "src/types";
 
 type FetchProfileResponse = {
     profile: Profile;
     user: User;
     kyc_verification: KYCVerification;
+    kyc_verification_documents: KycVerificationDocument[]
 };
 
 
