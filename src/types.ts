@@ -229,9 +229,29 @@ export interface VirtualAccount {
   sort_code?: string;
   bank_address?: AddressObject;
   currency: "NGN" | "USD" | "GBP" | "CAD";
+  provider_status_message?: string;
   status: "pending" | "active" | "suspended" | 'failed' | 'empty';
   created_at: string;
   updated_at: string;
   routing_number?: string;
   wire_routing_number?: string;
 };
+
+
+export interface KycVerificationDocument {
+  created_at: string;
+  updated_at: string;
+  uuid: string;
+  id: number;
+  kyc_verification_id: string;
+  status: string;
+  id_issued_by?: string;
+  id_type: string;
+  id_number: string;
+  upload_session_provider?: string;
+  upload_session_provider_code?: string;
+  id_issue_date: string;
+  id_expiry_date: string;
+  id_country?: string;
+  id_images: string;
+}

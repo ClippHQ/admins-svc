@@ -2,9 +2,18 @@ import { useInfiniteQuery, InfiniteData, useQuery, useMutation } from "@tanstack
 import { useCallback } from "react";
 import apiClient from "src/services/apiService";
 import { API_ENDPOINTS } from "src/services/endpointDefinition";
-import { PaginatedResponse, Payout, TransactionWA, VirtualAccount, WalletAccount } from "src/types";
+import { PaginatedResponse, Payout, Profile, TransactionWA, VirtualAccount, WalletAccount } from "src/types";
 
 
+
+type FethhVirtualAccountDetailsResponse = {
+    data: {
+        account: VirtualAccount;
+        profile: Profile;
+    };
+    message: string;
+    success: boolean;
+}
 
 export function useTransactions({
     limit = 20,
@@ -127,6 +136,46 @@ export function useVirtualAccounts(wallet_id: string = '') {
 }
 
 
+export function useAllVirtualAccounts({ limit = 20, status = 'all', currency = 'all', provider = 'all' }: { limit?: number; status?: string; currency?: string; provider?: string }) {
+    async function fetchAllVirtualAccounts(pageNumber: number, limitNumber: number) {
+        const params = new URLSearchParams({ page: String(pageNumber), limit: String(limitNumber) });
+        if (status && status !== 'all') params.append('status', status);
+        if (currency && currency !== 'all') params.append('currency', currency);
+        if (provider && provider !== 'all') params.append('provider', provider);
+        const res = await apiClient.get(`${API_ENDPOINTS.FETCH_ALL_VIRTUAL_ACCOUNTS}?${params.toString()}`);
+        return res.data as PaginatedResponse<VirtualAccount>;
+    }
+
+    const extractVirtualAccountsFromPayload = useCallback((data?: InfiniteData<PaginatedResponse<VirtualAccount>>): VirtualAccount[] => {
+        const accounts: VirtualAccount[] = [];
+        data?.pages.forEach(page => {
+            accounts.push(...page.payload);
+        });
+        return accounts;
+    }, []);
+
+    const infiniteQueryResponse = useInfiniteQuery({
+        initialPageParam: 1,
+        queryKey: ['fetch-all-virtual-accounts', status, currency, provider],
+        queryFn: ({ pageParam = 1 }) => fetchAllVirtualAccounts(pageParam, limit),
+        getNextPageParam: (lastPage) => {
+            if (!lastPage) return undefined;
+            const morePagesExist = lastPage.page <= lastPage.rows;
+            if (!morePagesExist) return undefined;
+            return lastPage.page + 1;
+        }
+    });
+
+    const virtualAccounts = extractVirtualAccountsFromPayload(infiniteQueryResponse.data);
+
+    return {
+        ...infiniteQueryResponse,
+        rawData: infiniteQueryResponse.data,
+        data: virtualAccounts,
+    };
+}
+
+
 export function useAddRemovePayoutLien() {
     const addRemovePayoutLien = async (payload: {wallet_id: string; action: 'add' | 'remove'}) => {
         const res = await apiClient.post(API_ENDPOINTS.ADD_REMOVE_PAYOUT_LIEN + '/' + payload.wallet_id, { action: payload.action });
@@ -137,4 +186,20 @@ export function useAddRemovePayoutLien() {
         mutationFn: addRemovePayoutLien,
         mutationKey: ['add-remove-payout-lien'],
     });
+}
+
+export function useVirtualAccountDetails(virtual_account_id: string = '') {
+
+    const fetchVirtualAccountDetails = async (virtual_account_id: string) => {
+        const res = await apiClient.get(`${API_ENDPOINTS.FETCH_VIRTUAL_ACCOUNT_DETAILS}/${virtual_account_id}`);
+  
+        return res.data as FethhVirtualAccountDetailsResponse;
+    }
+
+    return useQuery<FethhVirtualAccountDetailsResponse, Error>({
+        queryKey: ['fetch-virtual-account-details', virtual_account_id],
+        queryFn: () => fetchVirtualAccountDetails(virtual_account_id),
+        enabled: !!virtual_account_id, // only run the query if virtual_account_id is provided
+    });
+
 }
