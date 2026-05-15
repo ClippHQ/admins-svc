@@ -24,5 +24,6 @@ DEPOSIT_DETAILS: "/admin/deposit/get-deposit-details",  // GET /admin/deposit/ge
   FETCH_PROVIDER_BALANCES: '/admin/fetch-provider-balances', // GET
   FETCH_ALL_VIRTUAL_ACCOUNTS: '/admin/virtual-account/get-all-virtual-accounts', // GET
   FETCH_VIRTUAL_ACCOUNT_DETAILS: '/admin/virtual-account/get-virtual-account-details', // GET /<string:virtual_account_id>
+  FETCH_PAYOUT_DETAILS: '/admin/payout', // GET /<string:payout_id>
 
 };
