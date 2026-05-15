@@ -69,6 +69,8 @@ export function usePayouts({limit = 20, status = 'all'}: {limit?: number, status
 
     }
 
+
+
    const  extractPayoutsFromPayload = useCallback((data?: InfiniteData<PaginatedResponse<Payout>>): Payout[] =>{
         const payouts: Payout[] = [];
         console.log("Pages:", data);
@@ -100,6 +102,18 @@ export function usePayouts({limit = 20, status = 'all'}: {limit?: number, status
         rawData: infiniteQueryResponse.data,
         data: payouts,
     }
+}
+
+export function usePayoutDetails(payout_id: string) {
+    const fetchPayoutDetails = async (payout_id: string) => {
+        const res = await apiClient.get(`${API_ENDPOINTS.FETCH_PAYOUT_DETAILS}/${payout_id}`);
+        return res.data.data as {payout: Payout; profile: Profile};
+    }
+    return useQuery({
+        queryKey: ['fetch-payout-details', payout_id],
+        queryFn: () => fetchPayoutDetails(payout_id),
+        enabled: !!payout_id, // only run the query if payout_id is provided
+    });
 }
 
 

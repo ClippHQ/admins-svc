@@ -2,18 +2,13 @@
 
 import Head from "next/head";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
     Card,
     CardContent,
     Typography,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    Box,
-    IconButton,
     Alert,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import { Payout } from "src/types";
 import { formatAmount } from "src/lib/amount";
 import { usePayouts } from "src/api/transactions";
@@ -21,23 +16,12 @@ import { GenericTableGenerator } from "src/components/generic-table-generator";
 import { statusQueryOperator } from "src/components/status-query-operator";
 
 export default function DashboardPage() {
+    const router = useRouter();
     const [statusFilter, setStatusFilter] = useState<Payout['status'] | 'all'>('all')
     const infiniteData = usePayouts({ limit: 30, status: statusFilter });
     const { data: payouts, error: queryError } = infiniteData;
 
-
-    // Modal handler
-    const [selectedPayout, setSelectedPayout] = useState<Payout | null>(null);
-    const [openModal, setOpenModal] = useState(false);
-
     const error = queryError ? (queryError as Error).message ?? 'Something went wrong' : null;
-
-
-    // Collect and handle data for madal
-    const handleRowClick = (payout: Payout) => {
-        setSelectedPayout(payout);
-        setOpenModal(true);
-    };
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50">
@@ -117,7 +101,7 @@ export default function DashboardPage() {
                                                 }
                                             ]
                                         }}
-                                        onRowClick={handleRowClick}
+                                        onRowClick={(payout) => router.push(`/payouts/${payout.id}`)}
                                         infiniteQueryResult={infiniteData}
                                         paginationModel={{
                                             page: 0,
@@ -131,74 +115,6 @@ export default function DashboardPage() {
                     </main>
                 </div>
             </div>
-
-            {/* Modal data */}
-            <Dialog
-                open={openModal}
-                onClose={() => setOpenModal(false)}
-                maxWidth="md"
-                fullWidth
-            >
-                <DialogTitle className="flex justify-between items-center">
-                    Payout Details
-                    <IconButton onClick={() => setOpenModal(false)}>
-                        <CloseIcon />
-                    </IconButton>
-                </DialogTitle>
-
-                <DialogContent dividers>
-                    {selectedPayout && (
-                        <Box className="grid grid-cols-2 gap-6">
-
-                            {/* LEFT SECTION */}
-                            <Box>
-                                <Typography variant="h6" gutterBottom>
-                                    <strong><em>Source Info</em></strong>
-                                </Typography>
-
-                                <div className="space-y-2">
-                                    <p><strong>Account Name:</strong> {selectedPayout.account_name}</p>
-                                    <p><strong>Account Number:</strong> {selectedPayout.account_number}</p>
-                                    <p><strong>Banke Name:</strong> {selectedPayout.bank_name}</p>
-                                    <p><strong>Amount Source:</strong> {formatAmount({
-                                        amount: (selectedPayout?.amount_source ?? 0) / 100,
-                                        currency: selectedPayout?.currency_source ?? 'USD',
-                                        withDecimals: true
-                                    })}</p>
-                                    <p><strong>Fee:</strong> {formatAmount({
-                                        amount: (selectedPayout?.fee ?? 0) / 100,
-                                        currency: selectedPayout?.currency_source ?? 'USD',
-                                        withDecimals: true
-                                    })}</p>
-                                    <p><strong>Provider:</strong> {selectedPayout.provider}</p>
-                                </div>
-                            </Box>
-
-                            {/* RIGHT SECTION */}
-                            <Box>
-                                <Typography variant="h6" gutterBottom>
-                                    <strong><em>Destination Info</em></strong>
-                                </Typography>
-
-                                <div className="space-y-2">
-                                    <p><strong>Recipient det:</strong> {selectedPayout?.recipient_information + ''}</p>
-                                    <p><strong>Bank Address:</strong> {selectedPayout?.bank_address}</p>
-                                    <p><strong>Status:</strong> {selectedPayout.status}</p>
-                                    <p><strong>Amount Destination:</strong> {formatAmount({
-                                        currency: selectedPayout.currency_destination ?? 'USD',
-                                        amount: (selectedPayout.amount_destination ?? 0) / 100,
-                                        withDecimals: true
-                                    })}</p>
-                                    <p><strong>Created At:</strong>
-                                        {selectedPayout.created_at ?? "N/A"}
-                                    </p>
-                                </div>
-                            </Box>
-
-                        </Box>
-                    )}
-                </DialogContent>
-            </Dialog>
         </div>
     );
 }
