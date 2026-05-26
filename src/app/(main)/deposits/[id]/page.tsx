@@ -17,6 +17,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useTransactions } from "src/api/transactions";
+import { useRates } from "src/api/misc";
+import { Rates } from "src/lib/amount";
 import { GenericTableGenerator } from "src/components/generic-table-generator";
 import Link from "next/link";
 import Head from "next/head";
@@ -125,6 +127,11 @@ export default function DepositDetailsPage() {
     };
 
     const infiniteData = useTransactions({limit: 10, wallet_id: deposit?.deposit?.wallet_id ?? ''})
+    const { data: rates } = useRates();
+    const depositCurrency = deposit?.deposit?.currency?.toUpperCase();
+    const isNonNGN = !!depositCurrency && depositCurrency !== 'NGN';
+    const rawRate = isNonNGN ? rates?.[`${depositCurrency}-NGN` as keyof Rates] : undefined;
+    const rateToNGN = rawRate !== undefined ? 1 / rawRate : undefined;
 
     
 
@@ -301,10 +308,40 @@ export default function DepositDetailsPage() {
                                             <Typography variant="subtitle2">Deposit provider</Typography>
                                             <Typography variant="body1" textTransform="capitalize" fontWeight="bold">{deposit?.deposit?.provider ?? '-'}</Typography>
                                         </Grid>
-                      
 
 
                                     </Grid>
+
+                                    {isNonNGN && rateToNGN && (
+                                        <Grid container>
+                                            <Grid size={4}>
+                                                <Typography variant="subtitle2">Amount (NGN equiv.)</Typography>
+                                                <Typography variant="body1" fontWeight="bold">
+                                                    {formatAmount({
+                                                        amount: (deposit?.deposit?.amount ? deposit.deposit.amount / 100 : 0) * rateToNGN,
+                                                        currency: 'NGN',
+                                                        withDecimals: true,
+                                                    })}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid size={4}>
+                                                <Typography variant="subtitle2">Amount Settled (NGN equiv.)</Typography>
+                                                <Typography variant="body1" fontWeight="bold">
+                                                    {formatAmount({
+                                                        amount: (deposit?.deposit?.amount_settled ? deposit.deposit.amount_settled / 100 : 0) * rateToNGN,
+                                                        currency: 'NGN',
+                                                        withDecimals: true,
+                                                    })}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid size={4}>
+                                                <Typography variant="subtitle2">Rate ({depositCurrency}/NGN)</Typography>
+                                                <Typography variant="body1" fontWeight="bold">
+                                                    {rateToNGN.toLocaleString(undefined, { maximumFractionDigits: 4 })}
+                                                </Typography>
+                                            </Grid>
+                                        </Grid>
+                                    )}
 
                                     <Divider />
 

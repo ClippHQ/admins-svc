@@ -89,3 +89,10 @@ export const CURRENCY_SYMBOL_MAP: Record<
   USDT: { position: 'prefix', symbol: '$' },
   ZMW: { position: 'prefix', symbol: 'ZMW' }
 };
+
+// takes an array of strings ['usd', 'eur', 'ngn'] returns {'usd-eur': number, 'usdnng': number, 'eurngn': number} 
+type PairFloat <T extends string[]> = {
+  [K in `${T[number]}-${T[number]}`]: number;
+};
+
+export type Rates = PairFloat<Currency[]>;

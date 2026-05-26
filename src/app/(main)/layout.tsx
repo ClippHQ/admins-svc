@@ -14,8 +14,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { name: "Applications", href: "/applications" },
     { name: "Deposits", href: "/deposits" },
     { name: "Payouts", href: "/payouts" },
+    { name: "Conversions", href: "/conversions" },
     { name: "Virtual Acc", href: "/virtual-account" },
     { name: "Refferals", href: "/referrals" },
+    { name: "Misc", href: "/misc" },
     { name: "Sign out", href: "/auth/signin" },
   ];
 

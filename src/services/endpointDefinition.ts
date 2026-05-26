@@ -25,5 +25,11 @@ DEPOSIT_DETAILS: "/admin/deposit/get-deposit-details",  // GET /admin/deposit/ge
   FETCH_ALL_VIRTUAL_ACCOUNTS: '/admin/virtual-account/get-all-virtual-accounts', // GET
   FETCH_VIRTUAL_ACCOUNT_DETAILS: '/admin/virtual-account/get-virtual-account-details', // GET /<string:virtual_account_id>
   FETCH_PAYOUT_DETAILS: '/admin/payout', // GET /<string:payout_id>
+  FETCH_WALLET_BALANCES: '/admin/actions/wallet-account-balances', // GET
+  CONVERSIONS_TO_NGN: '/admin/actions/conversions-to-ngn-last-24h', // GET
+  GET_ALL_CONVERSIONS: '/admin/conversion/get-all-conversions',
+  FETCH_CONVERSION_DETAILS: '/admin/conversion',
+  FETCH_RATES: '/rate',
+  FETCH_RECENTLY_APPROVED_AMOUNTS: '/admin/deposit/recently-approved-amounts', // GET
 
 };

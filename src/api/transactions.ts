@@ -2,7 +2,7 @@ import { useInfiniteQuery, InfiniteData, useQuery, useMutation } from "@tanstack
 import { useCallback } from "react";
 import apiClient from "src/services/apiService";
 import { API_ENDPOINTS } from "src/services/endpointDefinition";
-import { PaginatedResponse, Payout, Profile, TransactionWA, VirtualAccount, WalletAccount } from "src/types";
+import { Conversion, PaginatedResponse, Payout, Profile, TransactionWA, VirtualAccount, WalletAccount } from "src/types";
 
 
 
@@ -199,6 +199,59 @@ export function useAddRemovePayoutLien() {
     return useMutation({
         mutationFn: addRemovePayoutLien,
         mutationKey: ['add-remove-payout-lien'],
+    });
+}
+
+function resolveConversionFilter(filterValue: string, filterKey: string) {
+    if (filterValue === 'all' || !filterValue) return '';
+    return `&${filterKey}=${filterValue}`;
+}
+
+export function useConversions({ limit = 20, filterDict = {} }: { limit?: number; filterDict?: Partial<Record<string, string>> }) {
+    async function fetchConversions(pageNumber: number, limitNumber: number) {
+        const filterQuery = Object.entries(filterDict).map(([key, value]) => resolveConversionFilter(value!, key)).join('');
+        const res = await apiClient.get(`${API_ENDPOINTS.GET_ALL_CONVERSIONS}?page=${pageNumber}&limit=${limitNumber}${filterQuery}`);
+        return res.data as PaginatedResponse<Conversion>;
+    }
+
+    const extractConversionsFromPayload = useCallback((data?: InfiniteData<PaginatedResponse<Conversion>>): Conversion[] => {
+        const conversions: Conversion[] = [];
+        data?.pages.forEach(page => {
+            conversions.push(...page.payload);
+        });
+        return conversions;
+    }, []);
+
+    const infiniteQueryResponse = useInfiniteQuery({
+        initialPageParam: 1,
+        queryKey: ['fetch-all-conversions', filterDict],
+        queryFn: ({ pageParam = 1 }) => fetchConversions(pageParam, limit),
+        getNextPageParam: (lastPage) => {
+            if (!lastPage) return undefined;
+            const morePagesExist = lastPage.page <= lastPage.rows;
+            if (!morePagesExist) return undefined;
+            return lastPage.page + 1;
+        }
+    });
+
+    const conversions = extractConversionsFromPayload(infiniteQueryResponse.data);
+
+    return {
+        ...infiniteQueryResponse,
+        rawData: infiniteQueryResponse.data,
+        data: conversions,
+    };
+}
+
+export function useConversionDetails(conversion_id: string) {
+    const fetchConversionDetails = async (id: string) => {
+        const res = await apiClient.get(`${API_ENDPOINTS.FETCH_CONVERSION_DETAILS}/${id}`);
+        return res.data.data as { conversion: Conversion; profile: Profile };
+    };
+    return useQuery({
+        queryKey: ['fetch-conversion-details', conversion_id],
+        queryFn: () => fetchConversionDetails(conversion_id),
+        enabled: !!conversion_id,
     });
 }
 
