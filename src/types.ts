@@ -255,3 +255,23 @@ export interface KycVerificationDocument {
   id_country?: string;
   id_images: string;
 }
+export interface Conversion {
+  wallet_id: string;
+  provider: string;
+  provider_code?: string;
+  provider_user?: string;
+  code?: string;
+  currency_source: string;
+  currency_destination: string;
+  rate: number;
+  fee: number;
+  status: string;
+  created_at: string;
+  id: string;
+  updated_at: string;
+  reference?: string;
+  quote_reference?: string;
+  amount_destination: number;
+  amount_source: number;
+  type: 'fiat' | 'crypto';
+}
