@@ -100,7 +100,7 @@ export default function DashboardPage() {
                   }}
                   customFilterOperators={{
                     status: statusQueryOperator<Deposit, Deposit['status'] | 'all'>(['in_review', 'rejected', 'pending', 'successful', 'failed', 'all']),
-                    provider: statusQueryOperator<Deposit, Deposit['provider'] | 'all'>(['all', 'graph', 'noah', 'quidax', 'fincra', 'paystack', 'flutterwave'])
+                    provider: statusQueryOperator<Deposit, Deposit['provider'] | 'all'>(['all', 'graph', 'noah', 'quidax', 'fincra', 'paystack', 'kwiikpay', 'flutterwave'])
                   }}
                   filterModel={{
                     items: [
