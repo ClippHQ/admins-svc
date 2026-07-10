@@ -207,9 +207,10 @@ export type PaginatedResponse<T> = {
 };
 
 
-type AddressObject = {
+export type AddressObject = {
     city: string;
     line1: string;
+    line2?: string;
     state: string;
     country: string;
     postal_code: string;
@@ -274,4 +275,48 @@ export interface Conversion {
   amount_destination: number;
   amount_source: number;
   type: 'fiat' | 'crypto';
+}
+
+// Step 1 of the business-account creation wizard (POST /business).
+// Later steps will add contact_phone, contact_email, address, service_information,
+// documents and beneficial_owners on top of this.
+export interface BusinessBasicInfo {
+  name: string;
+  business_type: string;
+  industry: string;
+  id_type: 'ein' | 'cac';
+  id_number: string;
+  id_country: string;
+  dof: string; // YYYY-MM-DD
+}
+
+export interface BusinessServiceInformation {
+  estimated_annual_revenue: number;
+  expected_monthly_inflow: number;
+  financial_services_usage: boolean;
+  third_party_usage: boolean;
+}
+
+// Step 2 of the business-account creation wizard: address is required,
+// service_information is optional.
+export interface BusinessAddressInfo {
+  address: AddressObject;
+  service_information?: BusinessServiceInformation;
+}
+
+export type BusinessDocumentType =
+  | 'business_registration'
+  | 'incorporation_certificate'
+  | 'memorandum_articles'
+  | 'business_license';
+
+export interface BusinessDocument {
+  type: BusinessDocumentType;
+  url: string;
+}
+
+export interface BusinessSignedUrlResponse {
+  upload_uri: string;
+  public_uri: string;
+  expires: string;
 }

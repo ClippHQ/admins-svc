@@ -32,4 +32,7 @@ DEPOSIT_DETAILS: "/admin/deposit/get-deposit-details",  // GET /admin/deposit/ge
   FETCH_RATES: '/rate',
   FETCH_RECENTLY_APPROVED_AMOUNTS: '/admin/deposit/recently-approved-amounts', // GET
 
+  BUSINESS_SIGNED_URL: '/business/signed-url', // POST { type, mime_type } -> { upload_uri, public_uri, expires }
+  BUSINESS_FORM: '/business/form', // POST BusinessWizardData
+
 };
