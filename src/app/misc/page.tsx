@@ -1,7 +1,9 @@
 "use client";
 
 import Head from "next/head";
+import Link from "next/link";
 import {
+    Button,
     Card,
     CardContent,
     LinearProgress,
@@ -59,6 +61,12 @@ export default function MiscPage() {
                         </Typography>
                         <div className="text-sm text-zinc-500 dark:text-zinc-400 mb-8">
                             Financial summaries across deposits, conversions and wallet balances
+                        </div>
+
+                        <div className="mb-8">
+                            <Link href="/misc/business-account">
+                                <Button variant="contained">Create Business Account</Button>
+                            </Link>
                         </div>
 
                         <div className="flex flex-col gap-6">
