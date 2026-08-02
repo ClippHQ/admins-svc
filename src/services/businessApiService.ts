@@ -5,7 +5,7 @@ import { getApplicationToken } from "src/lib/application-token";
 // authenticated via ?application_token=<jwt>, not the admin's localStorage session,
 // so it must not carry the admin token or trigger the admin 401 -> /auth/login redirect.
 const businessApiClient: AxiosInstance = axios.create({
-  baseURL: process.env.BASE_URL || "http://localhost:8080",
+  baseURL: process.env.BASE_URL || "https://api.getkite.app/",
   timeout: 120000,
   headers: {
     "Content-Type": "application/json",
