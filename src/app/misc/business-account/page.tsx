@@ -25,6 +25,8 @@ import { BusinessBasicInfo } from "src/types";
 
 const DEFAULT_FORM: BusinessBasicInfo = {
   name: "",
+  email: "",
+  phone: "",
   business_type: "soleProprietor",
   industry: "",
   id_type: "ein",
@@ -34,6 +36,8 @@ const DEFAULT_FORM: BusinessBasicInfo = {
 };
 
 type FormErrors = Partial<Record<keyof BusinessBasicInfo, string>>;
+
+const PHONE_NUMBER_PATTERN = /^\+[1-9]\d{7,14}$/;
 
 export default function BusinessAccountStepOne() {
   const router = useRouter();
@@ -58,6 +62,12 @@ export default function BusinessAccountStepOne() {
   function validate(): FormErrors {
     const nextErrors: FormErrors = {};
     if (!form.name.trim()) nextErrors.name = "Business name is required";
+    if (!form.email.trim()) nextErrors.email = "Email is required";
+    if (!form.phone.trim()) {
+      nextErrors.phone = "Phone is required";
+    } else if (!PHONE_NUMBER_PATTERN.test(form.phone.trim())) {
+      nextErrors.phone = "Phone must start with +country code";
+    }
     if (!form.industry) nextErrors.industry = "Industry is required";
     if (!form.id_number.trim()) nextErrors.id_number = "ID number is required";
     if (!form.id_country) nextErrors.id_country = "ID country is required";
@@ -110,6 +120,39 @@ export default function BusinessAccountStepOne() {
                     required
                     fullWidth
                   />
+
+                  <Grid container spacing={2}>
+                    <Grid size={6}>
+                      <TextField
+                        label="Email"
+                        type="email"
+                        value={form.email}
+                        onChange={(e) => setField("email", e.target.value)}
+                        error={!!errors.email}
+                        helperText={errors.email}
+                        required
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid size={6}>
+                      <TextField
+                        label="Phone"
+                        type="tel"
+                        value={form.phone}
+                        onChange={(e) => setField("phone", e.target.value)}
+                        error={!!errors.phone}
+                        helperText={errors.phone || "Use international format, e.g. +2348012345678"}
+                        slotProps={{
+                          htmlInput: {
+                            inputMode: "tel",
+                            pattern: "\\+[1-9][0-9]{7,14}",
+                          },
+                        }}
+                        required
+                        fullWidth
+                      />
+                    </Grid>
+                  </Grid>
 
                   <Grid container spacing={2}>
                     <Grid size={6}>

@@ -278,10 +278,12 @@ export interface Conversion {
 }
 
 // Step 1 of the business-account creation wizard (POST /business).
-// Later steps will add contact_phone, contact_email, address, service_information,
-// documents and beneficial_owners on top of this.
+// Later steps will add address, service_information, documents and
+// beneficial_owners on top of this.
 export interface BusinessBasicInfo {
   name: string;
+  email: string;
+  phone: string;
   business_type: string;
   industry: string;
   id_type: 'ein' | 'cac';
