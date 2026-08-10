@@ -124,7 +124,7 @@ export default function BusinessAccountStepOne() {
                   <Grid container spacing={2}>
                     <Grid size={6}>
                       <TextField
-                        label="Email"
+                        label="Business Contact Email"
                         type="email"
                         value={form.email}
                         onChange={(e) => setField("email", e.target.value)}
@@ -136,7 +136,7 @@ export default function BusinessAccountStepOne() {
                     </Grid>
                     <Grid size={6}>
                       <TextField
-                        label="Phone"
+                        label="Business Contact Phone"
                         type="tel"
                         value={form.phone}
                         onChange={(e) => setField("phone", e.target.value)}
